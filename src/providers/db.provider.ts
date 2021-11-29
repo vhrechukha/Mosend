@@ -18,7 +18,7 @@ import { User } from '../modules/user/entities/user.entity';
         password: appConfigService.get('DB_PASSWORD'),
         database: appConfigService.get('DB_DATABASE'),
         entities: [User],
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [AppConfigService],
     } as TypeOrmModuleAsyncOptions),
