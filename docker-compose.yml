@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    environment:
+      - APP_PORT=3000
+      - REDIS_URL=redis://cache
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=mosend
+      - DB_DATABASE=mosend
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_CACHE_TTL=360
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=mosend
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mosend
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    restart: always
+    expose:
+      - 6379
+    volumes:
+      - /mnt/c/redis-data:/redis-data

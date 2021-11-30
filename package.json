@@ -25,16 +25,21 @@
     "migrations:down": "npx typeorm migration:revert"
   },
   "dependencies": {
+    "@nestjs/schedule": "^1.0.2",
+    "@nestjs/swagger": "^5.1.5",
+    "@types/redis": "^2.8.32",
     "bcrypt": "^5.0.1",
+    "cache-manager": "^3.6.0",
+    "cache-manager-redis-store": "^2.0.0",
     "faker": "^5.5.3",
     "pg": "^8.7.1",
+    "redis": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "swagger-ui-express": "^4.1.6",
     "typeorm": "^0.2.41"
   },
   "devDependencies": {
-    "@nestjs/swagger": "^5.1.5",
     "@nestjs/cli": "^8.0.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.1.5",
