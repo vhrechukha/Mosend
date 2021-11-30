@@ -18,6 +18,12 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_CACHE_TTL=360
+      - JWT_SECRET=secret
+      - JWT_EXPIRES_IN=36000
+      - JWT_NOT_BEFORE=5
+      - JWT_ISSUER=mosend
+      - JWT_SUBJECT=mosend
+      - JWT_AUDIENCE=mosend.com
     ports:
       - "3000:3000"
     depends_on:
