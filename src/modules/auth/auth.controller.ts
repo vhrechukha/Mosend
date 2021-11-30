@@ -18,7 +18,10 @@ export class AuthController {
   @Post('/login')
   async login(@Body() data: LoginDto) {
     const user = await this.userService.findOneByEmail(data.email);
-    if (!user) throw new Error('User with this email not found.');
+
+    if (!user) {
+      throw new Error('User with this email not found.');
+    }
 
     await this.authService.validate({
       password: data.password,
