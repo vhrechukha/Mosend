@@ -24,7 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           notBefore: configService.get('JWT_NOT_BEFORE'),
           issuer: configService.get('JWT_ISSUER'),
           subject: configService.get('JWT_SUBJECT'),
-          // jti
+          jwtid: configService.get('JWT_ID'),
         },
       }),
     }),

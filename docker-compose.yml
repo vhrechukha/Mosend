@@ -24,6 +24,7 @@ services:
       - JWT_ISSUER=mosend
       - JWT_SUBJECT=mosend
       - JWT_AUDIENCE=mosend.com
+      - JWT_ID=jwtid
     ports:
       - "3000:3000"
     depends_on:
