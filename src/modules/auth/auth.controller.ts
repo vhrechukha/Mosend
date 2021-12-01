@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -20,7 +20,10 @@ export class AuthController {
     const user = await this.userService.findOneByEmail(data.email);
 
     if (!user) {
-      throw new Error('User with this email not found.');
+      throw new HttpException(
+        'User with this email not found.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     await this.authService.validate({
@@ -36,7 +39,10 @@ export class AuthController {
     const userExists = await this.userService.findOneByEmail(data.email);
 
     if (userExists) {
-      throw new Error('User is already exists.');
+      throw new HttpException(
+        'User is already exists.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const user = await this.userService.save({

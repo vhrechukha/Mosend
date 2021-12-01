@@ -13,7 +13,10 @@ export class AuthService {
 
     if (result) return result;
 
-    throw new Error('Password or email is incorrect.');
+    throw new HttpException(
+      'Password or email is incorrect.',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async login(user) {
