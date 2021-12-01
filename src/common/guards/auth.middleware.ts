@@ -1,4 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from '../../modules/auth/auth.service';
 import { UserService } from '../../modules/user/user.service';
 
@@ -9,7 +10,7 @@ export class AuthMiddleware implements CanActivate {
     private readonly userService: UserService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<any> {
-    const request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
 
     const payload = await this.authService.verifyToken(
       request.headers.authorization.split(' ')[1],
