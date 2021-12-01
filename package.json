@@ -33,6 +33,8 @@
     "bcrypt": "^5.0.1",
     "cache-manager": "^3.6.0",
     "cache-manager-redis-store": "^2.0.0",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.2",
     "faker": "^5.5.3",
     "lodash": "^4.17.21",
     "passport": "^0.4.1",

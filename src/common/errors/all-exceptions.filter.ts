@@ -23,7 +23,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
         exception.code ||
         HttpStatus[status || exception.response?.statusCode] ||
         '',
-      message: response.message || response.message?.[0] || exception.message || exception.message?.error  || '',
+      message:
+        response.message ||
+        response.message?.[0] ||
+        exception.response?.message?.[0] ||
+        exception.message ||
+        exception.message?.error ||
+        '',
     });
   }
 }
