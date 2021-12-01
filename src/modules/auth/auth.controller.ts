@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { pick } from 'lodash';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -6,7 +14,8 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { RegisterDto } from '../user/dto/register.dto';
 import { LoginDto } from '../user/dto/login.dto';
 
-import { Request } from 'express';
+import { UserD } from '../../common/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -57,7 +66,7 @@ export class AuthController {
   @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
   @Post('/me')
-  me(@Req() req: Request & { userId: number }) {
-    return this.userService.findOneById(req.userId);
+  me(@UserD() user: User) {
+    return pick(user, ['email', 'name']);
   }
 }

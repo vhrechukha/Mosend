@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 import * as bcrypt from 'bcrypt';
 
@@ -20,7 +19,6 @@ export class AuthService {
   }
 
   async login(user) {
-    console.log(user);
     return {
       access_token: this.jwtService.sign({
         id: user.id,
@@ -32,7 +30,6 @@ export class AuthService {
     try {
       return this.jwtService.verify(token);
     } catch (e) {
-      console.log(e)
       return false;
     }
   }
