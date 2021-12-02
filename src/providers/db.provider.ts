@@ -4,6 +4,7 @@ import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 import { AppConfigService } from '../config/app.config.service';
 import { AppConfigModule } from '../config/app.config.module';
 import { User } from '../modules/user/entities/user.entity';
+import { File } from '../modules/file/entities/file.entity';
 
 @Module({
   imports: [
@@ -17,11 +18,11 @@ import { User } from '../modules/user/entities/user.entity';
         username: appConfigService.get('DB_USERNAME'),
         password: appConfigService.get('DB_PASSWORD'),
         database: appConfigService.get('DB_DATABASE'),
-        entities: [User],
+        entities: [User, File],
         // migrations: ['dist/database/migrations/*{.ts,.js}'],
         // migrationsTableName: 'migrations_typeorm',
         // migrationsRun: true,
-        synchronize: false,
+        synchronize: true,
       }),
       inject: [AppConfigService],
     } as TypeOrmModuleAsyncOptions),

@@ -10,7 +10,6 @@ import {
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { RegisterDto } from '../user/dto/register.dto';
 import { LoginDto } from '../user/dto/login.dto';
 
@@ -64,7 +63,6 @@ export class AuthController {
   }
 
   @UseGuards(AuthMiddleware)
-  @ApiBearerAuth()
   @Post('/me')
   me(@UserD() user: User) {
     return pick(user, ['email', 'name']);

@@ -23,8 +23,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           audience: configService.get('JWT_AUDIENCE'),
           notBefore: configService.get('JWT_NOT_BEFORE'),
           issuer: configService.get('JWT_ISSUER'),
-          subject: configService.get('JWT_SUBJECT'),
-          jwtid: configService.get('JWT_ID'),
         },
       }),
     }),

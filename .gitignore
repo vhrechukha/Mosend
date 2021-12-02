@@ -1,5 +1,6 @@
 .env.development
 .env.production
+aws.txt
 
 # compiled output
 /dist

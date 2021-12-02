@@ -14,7 +14,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    let message = (exception as any).message.message;
+    let message = (exception as any)?.message?.message;
     let code = 'HttpException';
     let status: HttpStatus;
 
@@ -38,11 +38,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
           exception.response?.message?.[0] ||
           exception.message ||
           exception.message?.error ||
-          exception.response.statusCode ||
+          exception.response?.statusCode ||
           '';
         code =
-          exception.code ||
-          HttpStatus[status || exception.response?.statusCode] ||
+          exception?.code ||
+          HttpStatus[status || exception?.response?.statusCode] ||
           '';
     }
 

@@ -16,8 +16,8 @@ export class AuthMiddleware implements CanActivate {
       request.headers.authorization.split(' ')[1],
     );
 
-    if (payload?.id) {
-      request.user = await this.userService.findOneById(payload.id);
+    if (payload?.sub) {
+      request.user = await this.userService.findOneById(payload.sub);
     }
 
     return payload;
