@@ -7,6 +7,7 @@ import { User } from '../user/entities/user.entity';
 import { UserD } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FinalizeDto } from './dto/Finalize.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('file')
 export class FileController {
@@ -15,6 +16,7 @@ export class FileController {
     private readonly s3Service: S3Service,
   ) {}
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post()
   async initialize(@UserD() user: User, @Body() data: InitializeDto) {
@@ -23,15 +25,14 @@ export class FileController {
       data.filename,
     );
 
-    const file = await this.fileService.save({
+    return this.fileService.save({
       ...data,
       user_id: user.id,
       s3_path: UploadId,
     });
-
-    return file;
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/:id/chunk')
   async chunk(
@@ -39,21 +40,22 @@ export class FileController {
     @UserD() user: User,
     @Body() data: ChunkDto,
   ) {
-    const { s3_path, filename } = await this.fileService.findByIdAndUserId(
-      id,
-      user.id,
-    );
+    const file = await this.fileService.findByIdAndUserId(id, user.id);
 
-    // FIX: added update time in db for file
+    await this.fileService.save({
+      ...file,
+      updated_at: new Date(),
+    });
 
     return this.s3Service.chunk({
-      UploadId: s3_path,
+      UploadId: file.s3_path,
       PartNumber: data.partNumber,
       Body: data.body,
-      filename: filename,
+      filename: file.filename,
     });
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/:id/finalize')
   async finalize(
@@ -76,23 +78,35 @@ export class FileController {
     return final;
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/:id')
   async get(@Param('id') id: number, @UserD() user: User) {
     return this.fileService.findByIdAndUserId(id, user.id);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/:id/download')
   async download(@Param('id') id: number, @UserD() user: User) {
-    const { extension, filename } = await this.fileService.findByIdAndUserId(
-      id,
-      user.id,
-    );
+    const file = await this.fileService.findByIdAndUserId(id, user.id);
 
-    return this.s3Service.download({
-      extension,
-      filename,
+    const s3File = await this.s3Service.download({
+      extension: file.extension,
+      filename: file.filename,
     });
+
+    if (file.maxDownloadCount === file.downloadCount + 1) {
+      await this.s3Service.delete({ filename: file.filename });
+      await this.fileService.deleteById(file.id);
+    } else {
+      await this.fileService.save({
+        ...file,
+        lastDownloadAt: new Date(),
+        downloadCount: file.downloadCount + 1,
+      });
+    }
+
+    return s3File;
   }
 }

@@ -13,7 +13,7 @@ export class AuthMiddleware implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
 
     const payload = await this.authService.verifyToken(
-      request.headers.authorization.split(' ')[1],
+      request.headers?.authorization?.split(' ')?.[1],
     );
 
     if (payload?.sub) {

@@ -34,4 +34,8 @@ export class FileService {
       },
     });
   }
+
+  deleteById(chunkId) {
+    return this.repository.delete(chunkId);
+  }
 }

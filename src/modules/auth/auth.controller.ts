@@ -15,6 +15,7 @@ import { LoginDto } from '../user/dto/login.dto';
 
 import { UserD } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -62,6 +63,7 @@ export class AuthController {
     return this.authService.login(user);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/me')
   me(@UserD() user: User) {

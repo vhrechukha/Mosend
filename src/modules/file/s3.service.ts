@@ -88,7 +88,6 @@ export class S3Service {
   }
 
   async download({
-    extension,
     filename,
   }: {
     extension: string;
@@ -98,7 +97,26 @@ export class S3Service {
       this.s3.getObject(
         {
           Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: `${filename}`,
+          Key: filename,
+        },
+        (err: AWSError, data) => {
+          if (err) rej(err);
+          res(data);
+        },
+      ),
+    );
+  }
+
+  delete({
+    filename,
+  }: {
+    filename: string;
+  }): Promise<S3.Types.GetObjectOutput> {
+    return new Promise((res, rej) =>
+      this.s3.deleteObject(
+        {
+          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+          Key: filename,
         },
         (err: AWSError, data) => {
           if (err) rej(err);

@@ -48,8 +48,8 @@ export class File {
   @Column({ nullable: true })
   downloadCount: number;
 
-  @Column({ nullable: true })
-  lastDownloadAt: number;
+  @Column({ type: 'timestamp', nullable: true })
+  lastDownloadAt: Date;
 
   @Column({ nullable: true })
   maxDownloadCount: number;
