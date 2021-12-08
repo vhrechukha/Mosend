@@ -9,6 +9,12 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
+export enum ScanResult {
+  MALICIOUS = 'MALICIOUS',
+  PASSED = 'PASSED',
+  NOSCAN = 'NOSCAN'
+}
+
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
@@ -66,4 +72,23 @@ export class File {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updated_at: Date;
+
+
+  @Column({
+    type: 'enum',
+    enum: ScanResult,
+    default: ScanResult.NOSCAN
+  })
+  scanResult: ScanResult;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    nullable: true,
+  })
+  lastScanDate: Date;
+
+  @Column({
+    nullable: true,
+  })
+  scanDetectionInfo: string;
 }
