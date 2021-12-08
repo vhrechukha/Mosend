@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import {Exclude} from "class-transformer";
 
 @Entity('files')
 export class File {
@@ -24,6 +25,7 @@ export class File {
   contentType: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   s3_path: string;
 
   @Column({ default: 'inProgress' })
