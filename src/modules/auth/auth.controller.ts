@@ -17,6 +17,8 @@ import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
+import * as Errors from '../../common/errors';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -30,7 +32,7 @@ export class AuthController {
 
     if (!user) {
       throw new HttpException(
-        'User with this email not found.',
+        Errors.UserWithEmailNotFound,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -49,7 +51,7 @@ export class AuthController {
 
     if (userExists) {
       throw new HttpException(
-        'User is already exists.',
+        Errors.UserIsAlreadyExists,
         HttpStatus.BAD_REQUEST,
       );
     }

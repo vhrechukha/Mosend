@@ -1,6 +1,8 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import * as Errors from '../common/errors';
+
 @Injectable()
 export class AppConfigService {
   constructor(private readonly configService: ConfigService) {}
@@ -10,7 +12,7 @@ export class AppConfigService {
 
     if (!value) {
       throw new InternalServerErrorException(
-        `${name} parameter didn't not specified in .env file`,
+        `${name} ${Errors.EnvNotSpecified}`,
       );
     }
 
