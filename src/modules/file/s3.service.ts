@@ -3,6 +3,7 @@ import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { AWSError } from 'aws-sdk/lib/error';
 import { Readable } from 'stream';
+import stream from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -90,7 +91,7 @@ export class S3Service {
   async download({
     filename,
   }: {
-    extension: string;
+    extension?: string;
     filename: string;
   }): Promise<S3.Types.GetObjectOutput> {
     return new Promise((res, rej) =>
@@ -106,6 +107,18 @@ export class S3Service {
       ),
     );
   }
+
+    downloadReadStream({
+       filename,
+    }: {
+        extension?: string;
+        filename: string;
+    }): stream.Readable {
+      return this.s3.getObject({
+            Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+            Key: filename,
+       }).createReadStream();
+    }
 
   delete({
     filename,
