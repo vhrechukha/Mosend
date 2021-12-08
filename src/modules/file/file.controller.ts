@@ -4,7 +4,7 @@ import { S3Service } from './s3.service';
 import { InitializeDto } from './dto/Initialize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
 import { User } from '../user/entities/user.entity';
-import { UserD } from '../../common/decorators/user.decorator';
+import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -19,7 +19,7 @@ export class FileController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post()
-  async initialize(@UserD() user: User, @Body() data: InitializeDto) {
+  async initialize(@CurrentUser() user: User, @Body() data: InitializeDto) {
     const { UploadId } = await this.s3Service.init(
       data.extension,
       data.filename,
@@ -37,7 +37,7 @@ export class FileController {
   @Post('/:id/chunk')
   async chunk(
     @Param('id') id: number,
-    @UserD() user: User,
+    @CurrentUser() user: User,
     @Body() data: ChunkDto,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
@@ -60,7 +60,7 @@ export class FileController {
   @Post('/:id/finalize')
   async finalize(
     @Param('id') id: number,
-    @UserD() user: User,
+    @CurrentUser() user: User,
     @Body() data: FinalizeDto,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
@@ -81,14 +81,14 @@ export class FileController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/:id')
-  async get(@Param('id') id: number, @UserD() user: User) {
+  async get(@Param('id') id: number, @CurrentUser() user: User) {
     return this.fileService.findByIdAndUserId(id, user.id);
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/:id/download')
-  async download(@Param('id') id: number, @UserD() user: User) {
+  async download(@Param('id') id: number, @CurrentUser() user: User) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
 
     const s3File = await this.s3Service.download({
