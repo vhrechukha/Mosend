@@ -1,33 +1,30 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Readable } from 'stream';
 
+import { AvScanService } from './av-scan.service';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
+
+
 
 import { InitializeDto } from './dto/Initialize.dto';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
 
+
 import { FileError } from '../../common/errors';
 import { User } from '../user/entities/user.entity';
+import { File } from './entities/file.entity';
+
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
+import { UserD } from '../../common/decorators/user.decorator';
 
 @Controller('file')
 export class FileController {
   constructor(
     private readonly fileService: FileService,
+    private readonly avScanService: AvScanService,
     private readonly s3Service: S3Service,
   ) {}
 
@@ -132,5 +129,12 @@ export class FileController {
         });
       }
     });
+  }
+
+  @Post('/:id/report')
+  async report(
+      @Param('id') id: number,
+  ): Promise<File> {
+    return this.avScanService.check(id);
   }
 }

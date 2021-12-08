@@ -76,21 +76,22 @@ export class File {
   })
     updated_at: Date;
 
+
   @Column({
     type: 'enum',
     enum: ScanResult,
     default: ScanResult.NOSCAN,
   })
-    scanResult: ScanResult;
+  scan_result: ScanResult;
 
   @CreateDateColumn({
     type: 'timestamp',
     nullable: true,
   })
-    lastScanDate: Date;
+\  last_scan_date: Date;
 
   @Column({
     nullable: true,
   })
-    scanDetectionInfo: string;
+  scan_detection_info: string;
 }
