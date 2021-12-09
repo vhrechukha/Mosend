@@ -28,23 +28,25 @@ export class AvScanService {
                 });
 
                 result = await this.fileService.save({
+                    ...fileDb,
                     ...file,
                     s3_path: null,
                     scan_result: ScanResult.MALICIOUS,
                     last_scan_date: new Date(),
-                    scan_detection_info: JSON.parse(viruses),
+                    scan_detection_info: String(...viruses),
                 });
 
-                const user = await this.userService.findOneById(fileDb.id);
+                const user = await this.userService.findOneById(fileDb.user_id);
                 await this.userService.updateData({
+                    ...user,
                     suspended: true,
                     suspendedAt: new Date(),
-                    suspensionReason: JSON.parse(viruses), // is this what means by suspended reason for user?
-                    ...user,
+                    suspensionReason: String(...viruses), // is this what means by suspended reason for user?
                 });
             } else if (!isInfected) {
                 result = await this.fileService.save({
                     ...file,
+                    ...fileDb,
                     scan_result: ScanResult.PASSED,
                     last_scan_date: new Date(),
                 });

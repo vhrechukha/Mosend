@@ -31,7 +31,7 @@ export class File {
   @Column()
   contentType: string;
 
-  @Column()
+  @Column({ nullable: true })
   s3_path: string;
 
   @Column({ default: 'inProgress' })
