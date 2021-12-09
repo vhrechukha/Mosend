@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserSeedService } from './user/user.service';
 
-import * as bcrypt from 'bcrypt';
 import * as faker from 'faker';
 
 @Injectable()
@@ -19,11 +18,11 @@ export class Seeder {
       users.push({
         name: faker.name.findName(),
         email: faker.internet.email(),
-        password: await bcrypt.hash(await faker.internet.password(), 10),
+        password: await faker.internet.password(),
       });
     }
 
-    return await Promise.all(this.userService.create(users)).catch((error) =>
+    return Promise.all(this.userService.create(users)).catch((error) =>
       Promise.reject(error),
     );
   }
