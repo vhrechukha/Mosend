@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Res,
+  UseGuards
+} from '@nestjs/common';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
 import { InitializeDto } from './dto/Initialize.dto';
@@ -8,6 +18,7 @@ import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import * as Errors from "../../common/errors";
 
 @Controller('file')
 export class FileController {
@@ -88,25 +99,34 @@ export class FileController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/:id/download')
-  async download(@Param('id') id: number, @CurrentUser() user: User) {
+  async download(@Res() res, @Param('id') id: number, @CurrentUser() user: User) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
+
+    if (!file) {
+      throw new HttpException(
+          Errors.FileWithThisIdNotFound,
+          HttpStatus.BAD_REQUEST,
+      );
+    }
 
     const s3File = await this.s3Service.download({
       extension: file.extension,
       filename: file.filename,
     });
 
-    if (file.maxDownloadCount === file.downloadCount + 1) {
-      await this.s3Service.delete({ filename: file.filename });
-      await this.fileService.deleteById(file.id);
-    } else {
-      await this.fileService.save({
-        ...file,
-        lastDownloadAt: new Date(),
-        downloadCount: file.downloadCount + 1,
-      });
-    }
+    s3File.pipe(res);
 
-    return s3File;
+    s3File.on('end', async () => {
+      if (file.maxDownloadCount === file.downloadCount + 1) {
+        await this.fileService.deleteById(file.id);
+        await this.s3Service.delete({ filename: file.filename });
+      } else {
+        await this.fileService.save({
+          ...file,
+          lastDownloadAt: new Date(),
+          downloadCount: file.downloadCount + 1,
+        });
+      }
+    });
   }
 }
