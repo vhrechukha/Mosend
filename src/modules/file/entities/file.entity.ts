@@ -15,6 +15,8 @@ export enum ScanResult {
   NOSCAN = 'NOSCAN'
 }
 
+export type S3Status = 'inProgress' | 'finished';
+
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
@@ -33,7 +35,7 @@ export class File {
   s3_path: string;
 
   @Column({ default: 'inProgress' })
-  s3_status: 'inProgress' | 'finished';
+  s3_status: S3Status;
 
   @Column()
   filesize: string;
