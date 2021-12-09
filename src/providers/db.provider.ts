@@ -22,7 +22,7 @@ import { File } from '../modules/file/entities/file.entity';
         // migrations: ['dist/database/migrations/*{.ts,.js}'],
         // migrationsTableName: 'migrations_typeorm',
         // migrationsRun: true,
-        synchronize: true,
+        synchronize: false,
       }),
       inject: [AppConfigService],
     } as TypeOrmModuleAsyncOptions),
