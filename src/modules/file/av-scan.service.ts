@@ -1,32 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
+import { Inject, Injectable } from "@nestjs/common";
 
 import { S3Service } from './s3.service';
-import NodeClam from 'clamscan';
 import { FileService } from './file.service';
 import { ScanResult, File } from './entities/file.entity';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AvScanService {
-    private avScan;
     constructor(
       private readonly s3Service: S3Service,
       private readonly fileService: FileService,
-      private readonly configService: ConfigService,
-    ) {
-        this.avScan = new NodeClam().init({
-            debugMode: true,
-            clamdscan: {
-                // Connect via Host/Port
-                host: configService.get('CLAMDSCAN_HOST'),
-                port: configService.get('CLAMDSCAN_PORT'),
-                // Connect via socket (preferred)
-                active: true,
-            },
-            preference: 'clamdscan',
-        });
-    }
+      @Inject('clamscan') private avScan
+    ) {}
 
     async check(id: number): Promise<File> {
         const fileDb = await this.fileService.findById(id);
@@ -34,7 +18,7 @@ export class AvScanService {
         if (fileDb.scan_result !== ScanResult.PASSED) {
             let result: File;
 
-            const { file, isInfected, viruses } = await this.avScan.then(av => av.scanStream(this.s3Service.downloadReadStream({ filename: fileDb.filename })));
+            const { file, isInfected, viruses } = await this.avScan.scanStream(this.s3Service.downloadReadStream({ filename: fileDb.filename }));
 
             if (isInfected) {
                 await this.s3Service.delete({
