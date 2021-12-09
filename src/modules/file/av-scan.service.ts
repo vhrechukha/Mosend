@@ -5,6 +5,7 @@ import { S3Service } from './s3.service';
 import NodeClam from 'clamscan';
 import { FileService } from './file.service';
 import { ScanResult, File } from './entities/file.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AvScanService {
@@ -12,16 +13,14 @@ export class AvScanService {
     constructor(
         private readonly s3Service: S3Service,
         private readonly fileService: FileService,
+        private readonly configService: ConfigService,
     ) {
         this.avScan = new NodeClam().init({
             debugMode: true,
             clamdscan: {
-                // Run scan using command line
-                path: '/usr/bin/clamdscan',
-                configFile: '/etc/clamd.d/daemon.conf',
                 // Connect via Host/Port
-                host: 'localhost',
-                port: 3310,
+                host: configService.get('CLAMDSCAN_HOST'),
+                port: configService.get('CLAMDSCAN_PORT'),
                 // Connect via socket (preferred)
                 active: true,
             },

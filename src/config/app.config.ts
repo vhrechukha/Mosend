@@ -14,4 +14,6 @@ export default registerAs('application', () => ({
   jwt_not_before: process.env['JWT_NOT_BEFORE'],
   jwt_issuer: process.env['JWT_ISSUER'],
   jwt_subject: process.env['JWT_SUBJECT'],
+  clamdcsn_port: process.env['CLAMDSCAN_PORT'],
+  clamdcsn_host: process.env['CLAMDSCAN_HOST'],
 }));
