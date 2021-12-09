@@ -27,6 +27,10 @@ export class UserService {
     });
   }
 
+  async updateData(data) {
+    return this.usersRepository.save({ ...data });
+  }
+
   async findOneByEmail(email) {
     return this.usersRepository.findOne({ email });
   }
