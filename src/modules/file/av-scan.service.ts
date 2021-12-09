@@ -11,9 +11,9 @@ import { ConfigService } from '@nestjs/config';
 export class AvScanService {
     private avScan;
     constructor(
-        private readonly s3Service: S3Service,
-        private readonly fileService: FileService,
-        private readonly configService: ConfigService,
+      private readonly s3Service: S3Service,
+      private readonly fileService: FileService,
+      private readonly configService: ConfigService,
     ) {
         this.avScan = new NodeClam().init({
             debugMode: true,
@@ -25,7 +25,7 @@ export class AvScanService {
                 active: true,
             },
             preference: 'clamdscan',
-         });
+        });
     }
 
     async check(id: number): Promise<File> {
@@ -34,14 +34,7 @@ export class AvScanService {
         if (fileDb.scan_result !== ScanResult.PASSED) {
             let result: File;
 
-            await new Promise(res => {
-                const fileWriteStream = fs.createWriteStream(`./src/files/${fileDb.filename}.${fileDb.extension}`);
-                this.s3Service.downloadReadStream({ filename: fileDb.filename }).pipe(fileWriteStream);
-
-                fileWriteStream.on('finish', res);
-            });
-
-            const { file, isInfected, viruses } = await this.avScan.then(av => av.isInfected(`./src/files/${fileDb.filename}.${fileDb.extension}`));
+            const { file, isInfected, viruses } = await this.avScan.then(av => av.scanStream(this.s3Service.downloadReadStream({ filename: fileDb.filename })));
 
             if (isInfected) {
                 await this.s3Service.delete({
@@ -65,9 +58,6 @@ export class AvScanService {
                     last_scan_date: new Date(),
                 });
             }
-
-            // Remove the file (for good measure)
-            if (fs.existsSync(`./src/files/${fileDb.filename}.${fileDb.extension}`)) fs.unlinkSync(`./src/files/${fileDb.filename}.${fileDb.extension}`);
 
             return result;
         }
