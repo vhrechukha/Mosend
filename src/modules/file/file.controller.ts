@@ -7,18 +7,22 @@ import {
   Param,
   Post,
   Res,
-  UseGuards
-} from '@nestjs/common';
+  UseGuards,
+} from "@nestjs/common";
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Readable } from 'stream';
+
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
+
 import { InitializeDto } from './dto/Initialize.dto';
+import { FinalizeDto } from './dto/Finalize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
+
+import * as Errors from "../../common/errors";
 import { User } from '../user/entities/user.entity';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
-import { FinalizeDto } from './dto/Finalize.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import * as Errors from "../../common/errors";
 
 @Controller('file')
 export class FileController {
@@ -61,7 +65,7 @@ export class FileController {
     return this.s3Service.chunk({
       UploadId: file.s3_path,
       PartNumber: data.partNumber,
-      Body: data.body,
+      Body: Readable.from(data.body),
       filename: file.filename,
     });
   }

@@ -32,7 +32,7 @@ export class S3Service {
     );
   }
 
-  async chunk({
+  chunk({
     UploadId,
     PartNumber,
     Body,
@@ -40,26 +40,16 @@ export class S3Service {
   }: {
     UploadId: string;
     PartNumber: number;
-    Body: Buffer | Uint8Array | Blob | string | Readable;
+    Body: Readable;
     filename: string;
-  }): Promise<S3.Types.UploadPartOutput> {
-    return new Promise((res, rej) =>
-      this.s3.uploadPart(
-        {
-          Body,
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-          PartNumber,
-          UploadId,
-        },
-        (err: AWSError, data) => {
-          if (err) {
-            rej(err);
-          }
-          res({ ...data });
-        },
-      ),
-    );
+  }) {
+    return this.s3.upload({
+      Body,
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      PartNumber,
+      UploadId,
+    }).promise();
   }
 
   async finalize({

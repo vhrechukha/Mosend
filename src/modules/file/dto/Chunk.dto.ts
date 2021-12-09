@@ -15,5 +15,5 @@ export class ChunkDto {
     default: 'some text',
   })
   @IsNotEmpty()
-  body: Buffer | Uint8Array | Blob | string | Readable;
+  body: Readable;
 }
