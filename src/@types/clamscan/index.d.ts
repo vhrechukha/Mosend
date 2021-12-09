@@ -59,6 +59,14 @@ declare module 'clamscan' {
             };
             preference: string;
         };
+        private _buildClamArgs;
+        private _buildClamFlags;
+        private _initSocket;
+        private _isClamavBinary;
+        private _isLocalHost;
+        private _isReadableStream;
+        private _ping;
+        private _processResult;
 
         init(options: Options, cb?: () => void): Promise<NodeClamFunctions>;
 
@@ -98,27 +106,7 @@ declare module 'clamscan' {
             viruses: any[];
         }> | NodeClamScanError | NodeClamFileError;
 
-        scanStream(stream: Transfrom<ReadableStream>, cb?: () => void): Promise<{
-            file: string;
-            isInfected: boolean;
-            viruses: any[];
-        }>;
-
-        private _buildClamArgs;
-
-        private _buildClamFlags;
-
-        private _initSocket;
-
-        private _isClamavBinary;
-
-        private _isLocalHost;
-
-        private _isReadableStream;
-
-        private _ping;
-
-        private _processResult;
+        scanStream(stream: Transfrom<ReadableStream>, cb?: (err, isInfected) => (void)): Promise<{ file: string; isInfected: boolean; viruses: any[] }>;
     }
 
     export interface NodeClamScanError {
