@@ -15,7 +15,6 @@ export class AvScanService {
     ) {
         this.avScan = new NodeClam().init({
             debugMode: true,
-            // prettier-ignore
             clamdscan: {
                 // Run scan using command line
                 path: '/usr/bin/clamdscan',
