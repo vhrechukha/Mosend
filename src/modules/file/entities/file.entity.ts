@@ -17,6 +17,8 @@ export enum ScanResult {
   NOSCAN = 'NOSCAN',
 }
 
+export type S3Status = 'inProgress' | 'finished';
+
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
@@ -88,7 +90,7 @@ export class File {
     type: 'timestamp',
     nullable: true,
   })
-\  last_scan_date: Date;
+  last_scan_date: Date;
 
   @Column({
     nullable: true,
