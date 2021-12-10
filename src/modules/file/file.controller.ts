@@ -30,7 +30,7 @@ export class FileController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post()
-  async initialize(@CurrentUser() user: User, @Body() data: InitializeDto) {
+  async initialize(@UserD() user: User, @Body() data: InitializeDto) {
     const { UploadId } = await this.s3Service.init(
       data.extension,
       data.filename,
