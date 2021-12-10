@@ -33,6 +33,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@nestjs/swagger": "^5.1.5",
     "@nestjs/typeorm": "^8.0.2",
+    "@types/clamscan": "^2.0.0",
     "@types/redis": "^2.8.32",
     "@types/uuid": "^8.3.3",
     "aws-sdk": "^2.1041.0",
