@@ -90,6 +90,6 @@ export class Filetable1639011772304 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.query('DROP TABLE files');
+    queryRunner.dropTable('files');
   }
 }
