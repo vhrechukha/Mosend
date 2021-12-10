@@ -29,8 +29,8 @@ export class File {
   @Exclude({ toPlainOnly: true })
     s3_path: string;
 
-  @Column({ default: 'inProgress' })
-    s3_status: 'inProgress' | 'finished';
+  @Column({ default: 'in_progress' })
+    s3_status: 'in_progress' | 'finished';
 
   @Column()
     filesize: string;

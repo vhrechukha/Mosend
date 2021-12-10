@@ -18,21 +18,21 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 'created_at',
             type: 'timestamp',
-            isNullable: false,
             default: 'now()',
           },
           {
             name: 'updated_at',
             type: 'timestamp',
-            isNullable: false,
             default: 'now()',
           },
           {
             name: 'max_download_count',
+            isNullable: true,
             type: 'int4',
           },
           {
             name: 'last_download_at',
+            isNullable: true,
             type: 'timestamp',
           },
           {
