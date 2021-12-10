@@ -121,14 +121,14 @@ export class FileController {
     s3File.pipe(res);
 
     s3File.on('end', async () => {
-      if (file.maxDownloadCount === file.downloadCount + 1) {
+      if (file.max_download_count === file.download_count + 1) {
         await this.fileService.deleteById(file.id);
         await this.s3Service.delete({ filename: file.filename });
       } else {
         await this.fileService.save({
           ...file,
-          lastDownloadAt: new Date(),
-          downloadCount: file.downloadCount + 1,
+          last_download_at: new Date(),
+          download_count: file.download_count + 1,
         });
       }
     });

@@ -28,15 +28,15 @@ export class Filetable1639011772304 implements MigrationInterface {
             default: 'now()',
           },
           {
-            name: 'maxDownloadCount',
+            name: 'max_download_count',
             type: 'int4',
           },
           {
-            name: 'lastDownloadAt',
+            name: 'last_download_at',
             type: 'timestamp',
           },
           {
-            name: 'downloadCount',
+            name: 'download_count',
             type: 'int4',
           },
           {
@@ -44,11 +44,11 @@ export class Filetable1639011772304 implements MigrationInterface {
             type: 'int4',
           },
           {
-            name: 'chunkSize',
+            name: 'chunk_size',
             type: 'int4',
           },
           {
-            name: 'chunkCount',
+            name: 'chunk_count',
             type: 'int4',
           },
           {
@@ -58,14 +58,14 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 's3_status',
             type: 'text',
-            default: "'inProgress'",
+            default: "'in_progress'",
           },
           {
             name: 's3_path',
             type: 'text',
           },
           {
-            name: 'contentType',
+            name: 'content_type',
             type: 'text',
           },
           {

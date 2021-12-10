@@ -11,5 +11,10 @@ export class FinalizeDto {
     default: 5,
   })
   @IsNotEmpty()
-    multipartUpload: any;
+    multipartUpload: {
+    Parts: {
+      PartNumber: number;
+      ETag: string
+    }
+  }[];
 }

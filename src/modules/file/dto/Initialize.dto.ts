@@ -8,7 +8,7 @@ export class InitializeDto {
   })
   @IsNotEmpty()
   @IsString()
-    contentType: string;
+    content_type: string;
 
   @ApiProperty({
     required: true,
@@ -31,21 +31,21 @@ export class InitializeDto {
     default: 18,
   })
   @IsNotEmpty()
-    chunkCount: number;
+    chunk_count: number;
 
   @ApiProperty({
     required: true,
     default: '5600',
   })
   @IsNotEmpty()
-    chunkSize: number;
+    chunk_size: number;
 
   @ApiProperty({
     required: true,
     default: '2',
   })
   @IsOptional()
-    maxDownloadCount: number;
+    max_download_count: number;
 
   @ApiProperty({
     required: true,

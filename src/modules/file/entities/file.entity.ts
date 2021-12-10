@@ -23,7 +23,7 @@ export class File {
     extension: string;
 
   @Column()
-    contentType: string;
+    content_type: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })
@@ -36,10 +36,10 @@ export class File {
     filesize: string;
 
   @Column()
-    chunkCount: number;
+    chunk_count: number;
 
   @Column()
-    chunkSize: number;
+    chunk_size: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn()
@@ -49,19 +49,19 @@ export class File {
     user_id: number;
 
   @Column({ nullable: true })
-    downloadCount: number;
+    download_count: number;
 
   @Column({ type: 'timestamp', nullable: true })
-    lastDownloadAt: Date;
+    last_download_at: Date;
 
   @Column({ nullable: true })
-    maxDownloadCount: number;
+    max_download_count: number;
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-    createdAt: Date;
+    created_at: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
