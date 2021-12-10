@@ -17,7 +17,7 @@ export enum ScanResult {
   NOSCAN = 'NOSCAN',
 }
 
-export type S3Status = 'inProgress' | 'finished';
+export type S3Status = 'in_progress' | 'finished';
 
 @Entity('files')
 export class File {
@@ -38,7 +38,7 @@ export class File {
     s3_path: string;
 
   @Column({ default: 'in_progress' })
-    s3_status: 'in_progress' | 'finished';
+    s3_status: S3Status;
 
   @Column()
     filesize: string;
@@ -78,22 +78,21 @@ export class File {
   })
     updated_at: Date;
 
-
   @Column({
     type: 'enum',
     enum: ScanResult,
     default: ScanResult.NOSCAN,
   })
-  scan_result: ScanResult;
+    scan_result: ScanResult;
 
   @CreateDateColumn({
     type: 'timestamp',
     nullable: true,
   })
-  last_scan_date: Date;
+    last_scan_date: Date;
 
   @Column({
     nullable: true,
   })
-  scan_detection_info: string;
+    scan_detection_info: string;
 }

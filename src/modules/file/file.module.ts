@@ -1,8 +1,7 @@
 import NodeClam from 'clamscan';
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
 
 import { FileService } from './file.service';
 import { File } from './entities/file.entity';
@@ -22,7 +21,7 @@ import { AvScanService } from './av-scan.service';
   controllers: [FileController],
   providers: [FileService, S3Service, AvScanService, {
     provide: 'clamscan',
-    useFactory: async (configService: ConfigService) => await (new NodeClam()).init({
+    useFactory: async (configService: ConfigService) => (new NodeClam()).init({
       debugMode: true,
       clamdscan: {
         // Connect via Host/Port
@@ -33,7 +32,7 @@ import { AvScanService } from './av-scan.service';
       },
       preference: 'clamdscan',
     }),
-    inject: [ConfigService]
+    inject: [ConfigService],
   }],
 })
 export class FileModule {}
