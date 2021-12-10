@@ -17,6 +17,8 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'no-plusplus': 'off',
+    'no-await-in-loop': 'off',
     'no-promise-executor-return': 'off',
     'max-len': ["error", {
       'code': 120

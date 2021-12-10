@@ -65,9 +65,21 @@ export class S3Service {
   download({
     filename,
   }: {
-    extension: string;
+    extension?: string;
     filename: string;
   }) {
+    return this.s3.getObject({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+    }).createReadStream();
+  }
+
+  downloadReadStream({
+    filename,
+  }: {
+    extension?: string;
+    filename: string;
+  }): Readable {
     return this.s3.getObject({
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
       Key: filename,

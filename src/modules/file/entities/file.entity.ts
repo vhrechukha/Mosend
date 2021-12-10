@@ -11,6 +11,14 @@ import { Exclude } from 'class-transformer';
 
 import { User } from '../../user/entities/user.entity';
 
+export enum ScanResult {
+  MALICIOUS = 'MALICIOUS',
+  PASSED = 'PASSED',
+  NOSCAN = 'NOSCAN',
+}
+
+export type S3Status = 'in_progress' | 'finished';
+
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
@@ -30,7 +38,7 @@ export class File {
     s3_path: string;
 
   @Column({ default: 'in_progress' })
-    s3_status: 'in_progress' | 'finished';
+    s3_status: S3Status;
 
   @Column()
     filesize: string;
@@ -56,6 +64,24 @@ export class File {
 
   @Column({ nullable: true })
     max_download_count: number;
+
+  @Column({
+    type: 'enum',
+    enum: ScanResult,
+    default: ScanResult.NOSCAN,
+  })
+    scan_result: ScanResult;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    nullable: true,
+  })
+    last_scan_date: Date;
+
+  @Column({
+    nullable: true,
+  })
+    scan_detection_info: string;
 
   @CreateDateColumn({
     type: 'timestamp',
