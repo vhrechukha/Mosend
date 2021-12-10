@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-
 import * as bcrypt from 'bcrypt';
+import { v4 } from 'uuid';
+
+import { UserError } from '../../common/errors';
 
 @Injectable()
 export class AuthService {
@@ -13,15 +14,21 @@ export class AuthService {
 
     if (result) return result;
 
-    throw new Error('Password or email is incorrect.');
+    throw new HttpException(
+      UserError.UserWithEmailNotFound,
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async login(user) {
-    console.log(user);
     return {
-      access_token: this.jwtService.sign({
-        id: user.id,
-      }),
+      access_token: this.jwtService.sign(
+        {},
+        {
+          subject: user.id.toString(),
+          jwtid: v4(),
+        },
+      ),
     };
   }
 
@@ -29,7 +36,6 @@ export class AuthService {
     try {
       return this.jwtService.verify(token);
     } catch (e) {
-      console.log(e)
       return false;
     }
   }

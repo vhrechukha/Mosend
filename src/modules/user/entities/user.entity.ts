@@ -1,19 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity, Column, PrimaryGeneratedColumn, OneToMany,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { File } from '../../file/entities/file.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  timestamp: Date;
+    timestamp: Date;
 
   @Column('text')
-  name: string;
+    name: string;
 
   @Column('text')
-  email: string;
+    email: string;
 
   @Column('text')
-  password: string;
+  @Exclude({ toPlainOnly: true })
+    password: string;
+
+  @OneToMany(() => File, (file) => file.id)
+    file: File[];
 }

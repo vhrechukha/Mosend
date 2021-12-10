@@ -8,13 +8,19 @@ export class UserTable1638217974847 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'int4',
+            type: 'int',
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'increment',
           },
           {
-            name: 'timestamp',
+            name: 'created_at',
+            type: 'timestamp',
+            isNullable: false,
+            default: 'now()',
+          },
+          {
+            name: 'updated_at',
             type: 'timestamp',
             isNullable: false,
             default: 'now()',
@@ -41,6 +47,6 @@ export class UserTable1638217974847 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.query(`DROP TABLE users`);
+    queryRunner.query('DROP TABLE users');
   }
 }

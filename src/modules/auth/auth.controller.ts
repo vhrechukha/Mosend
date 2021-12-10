@@ -1,12 +1,23 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { pick } from 'lodash';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { RegisterDto } from '../user/dto/register.dto';
 import { LoginDto } from '../user/dto/login.dto';
 
-import { Request } from 'express';
+import { CurrentUser } from '../../common/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
+
+import { UserError } from '../../common/errors';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +31,10 @@ export class AuthController {
     const user = await this.userService.findOneByEmail(data.email);
 
     if (!user) {
-      throw new Error('User with this email not found.');
+      throw new HttpException(
+        UserError.UserWithEmailNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     await this.authService.validate({
@@ -36,7 +50,10 @@ export class AuthController {
     const userExists = await this.userService.findOneByEmail(data.email);
 
     if (userExists) {
-      throw new Error('User is already exists.');
+      throw new HttpException(
+        UserError.UserIsAlreadyExists,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const user = await this.userService.save({
@@ -48,10 +65,10 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
   @Post('/me')
-  me(@Req() req: Request & { userId: number }) {
-    return this.userService.findOneById(req.userId);
+  me(@CurrentUser() user: User) {
+    return pick(user, ['email', 'name']);
   }
 }

@@ -7,30 +7,13 @@ services:
       dockerfile: Dockerfile
       args:
         - NODE_ENV=development
-    environment:
-      - APP_PORT=3000
-      - REDIS_URL=redis://cache
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=mosend
-      - DB_DATABASE=mosend
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_CACHE_TTL=360
-      - JWT_SECRET=secret
-      - JWT_EXPIRES_IN=36000
-      - JWT_NOT_BEFORE=5
-      - JWT_ISSUER=mosend
-      - JWT_SUBJECT=mosend
-      - JWT_AUDIENCE=mosend.com
-      - JWT_ID=jwtid
+    env_file:
+      - env.docker
     ports:
       - "3000:3000"
     depends_on:
       - postgres
-    links:
-      - postgres:postgres
+      - redis
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -39,10 +22,10 @@ services:
   postgres:
     image: postgres:alpine
     restart: always
-    environment:
-      - POSTGRES_DB=mosend
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mosend
+    env_file:
+      - env.docker
+    ports:
+      - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 

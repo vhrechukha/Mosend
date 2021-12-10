@@ -1,17 +1,25 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from '../../modules/auth/auth.service';
+import { UserService } from '../../modules/user/user.service';
 
 @Injectable()
 export class AuthMiddleware implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
+
   async canActivate(context: ExecutionContext): Promise<any> {
-    const request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
 
     const payload = await this.authService.verifyToken(
-      request.headers.authorization.split(' ')[1],
+      request.headers?.authorization?.split(' ')?.[1],
     );
 
-    if (payload?.id) request.userId = payload.id;
+    if (payload?.sub) {
+      request.user = await this.userService.findOneById(payload.sub);
+    }
 
     return payload;
   }
