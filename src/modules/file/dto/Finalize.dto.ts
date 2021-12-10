@@ -5,7 +5,6 @@ import {
 } from '../../../common/validationDecorators/CheckObjectOnSpecificProperties.decorator';
 
 export class FinalizeDto {
-  // FIX: write custom decorator for checking object
   @CheckObjectOnSpecificProperties(['Parts', ['PartNumber', 'ETag']])
   @ApiProperty({
     required: true,
