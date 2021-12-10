@@ -7,65 +7,66 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
 import { Exclude } from 'class-transformer';
+
+import { User } from '../../user/entities/user.entity';
 
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @Column()
-  filename: string;
+    filename: string;
 
   @Column()
-  extension: string;
+    extension: string;
 
   @Column()
-  contentType: string;
+    contentType: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })
-  s3_path: string;
+    s3_path: string;
 
   @Column({ default: 'inProgress' })
-  s3_status: 's3_status' | 'finished';
+    s3_status: 's3_status' | 'finished';
 
   @Column()
-  filesize: string;
+    filesize: string;
 
   @Column()
-  chunkCount: number;
+    chunkCount: number;
 
   @Column()
-  chunkSize: number;
+    chunkSize: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn()
-  user: User;
+    user: User;
 
   @Column()
-  user_id: number;
+    user_id: number;
 
   @Column({ nullable: true })
-  downloadCount: number;
+    downloadCount: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  lastDownloadAt: Date;
+    lastDownloadAt: Date;
 
   @Column({ nullable: true })
-  maxDownloadCount: number;
+    maxDownloadCount: number;
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-  createdAt: Date;
+    createdAt: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  updated_at: Date;
+    updated_at: Date;
 }

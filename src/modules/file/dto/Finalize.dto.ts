@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import {
-  CheckObjectOnSpecificProperties
+  CheckObjectOnSpecificProperties,
 } from '../../../common/validationDecorators/CheckObjectOnSpecificProperties.decorator';
 
 export class FinalizeDto {
@@ -12,5 +12,5 @@ export class FinalizeDto {
     default: 5,
   })
   @IsNotEmpty()
-  multipartUpload: any;
+    multipartUpload: any;
 }

@@ -8,7 +8,7 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'airbnb',
-    'airbnb-typescript/base'
+    'airbnb-typescript'
   ],
   root: true,
   env: {
@@ -17,6 +17,11 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'no-promise-executor-return': 'off',
+    'max-len': ["error", {
+      'code': 120
+    }],
+    'import/no-cycle': 'off',
     'import/prefer-default-export': 'off',
     'class-methods-use-this': 'off',
     '@typescript-eslint/interface-name-prefix': 'off',

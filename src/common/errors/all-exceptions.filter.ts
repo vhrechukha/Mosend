@@ -28,22 +28,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
         code = (exception as any).code;
         break;
       default:
-        status =
-          exception instanceof HttpException
-            ? exception.getStatus()
-            : HttpStatus.INTERNAL_SERVER_ERROR;
-        message =
-          response.message ||
-          response.message?.[0] ||
-          exception.response?.message?.[0] ||
-          exception.message ||
-          exception.message?.error ||
-          exception.response?.statusCode ||
-          '';
-        code =
-          exception?.code ||
-          HttpStatus[status || exception?.response?.statusCode] ||
-          '';
+        status = exception instanceof HttpException
+          ? exception.getStatus()
+          : HttpStatus.INTERNAL_SERVER_ERROR;
+        message = response.message
+          || response.message?.[0]
+          || exception.response?.message?.[0]
+          || exception.message
+          || exception.message?.error
+          || exception.response?.statusCode
+          || '';
+        code = exception?.code
+          || HttpStatus[status || exception?.response?.statusCode]
+          || '';
     }
 
     response.status(status).json({

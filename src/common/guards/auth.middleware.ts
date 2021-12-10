@@ -9,6 +9,7 @@ export class AuthMiddleware implements CanActivate {
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {}
+
   async canActivate(context: ExecutionContext): Promise<any> {
     const request: Request = context.switchToHttp().getRequest();
 
