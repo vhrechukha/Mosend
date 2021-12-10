@@ -8,7 +8,7 @@ import {
   Post,
   Res,
   UseGuards,
-} from "@nestjs/common";
+} from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Readable } from 'stream';
 
@@ -19,7 +19,7 @@ import { InitializeDto } from './dto/Initialize.dto';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
 
-import * as Errors from "../../common/errors";
+import { FileError } from '../../common/errors';
 import { User } from '../user/entities/user.entity';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -51,7 +51,7 @@ export class FileController {
   @UseGuards(AuthMiddleware)
   @Post('/:id/chunk')
   async chunk(
-    @Param('id') id: number,
+  @Param('id') id: number,
     @CurrentUser() user: User,
     @Body() data: ChunkDto,
   ) {
@@ -74,7 +74,7 @@ export class FileController {
   @UseGuards(AuthMiddleware)
   @Post('/:id/finalize')
   async finalize(
-    @Param('id') id: number,
+  @Param('id') id: number,
     @CurrentUser() user: User,
     @Body() data: FinalizeDto,
   ) {
@@ -108,8 +108,8 @@ export class FileController {
 
     if (!file) {
       throw new HttpException(
-          Errors.FileWithThisIdNotFound,
-          HttpStatus.BAD_REQUEST,
+        FileError.FileWithThisIdNotFound,
+        HttpStatus.BAD_REQUEST,
       );
     }
 

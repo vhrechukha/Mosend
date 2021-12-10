@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import * as Errors from '../../common/errors';
 import * as bcrypt from 'bcrypt';
 import { v4 } from 'uuid';
+
+import { UserError } from '../../common/errors';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +15,7 @@ export class AuthService {
     if (result) return result;
 
     throw new HttpException(
-      Errors.UserWithEmailNotFound,
+      UserError.UserWithEmailNotFound,
       HttpStatus.BAD_REQUEST,
     );
   }

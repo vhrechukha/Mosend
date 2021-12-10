@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import * as Errors from '../common/errors';
+import { AppError } from '../common/errors';
 
 @Injectable()
 export class AppConfigService {
@@ -12,7 +12,7 @@ export class AppConfigService {
 
     if (!value) {
       throw new InternalServerErrorException(
-        `${name} ${Errors.EnvNotSpecified}`,
+        `${name} ${AppError.EnvNotSpecified}`,
       );
     }
 
