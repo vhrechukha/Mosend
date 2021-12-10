@@ -30,7 +30,7 @@ export class File {
     s3_path: string;
 
   @Column({ default: 'inProgress' })
-    s3_status: 's3_status' | 'finished';
+    s3_status: 'inProgress' | 'finished';
 
   @Column()
     filesize: string;
