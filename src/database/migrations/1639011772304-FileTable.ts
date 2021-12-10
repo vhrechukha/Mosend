@@ -10,7 +10,7 @@ export class Filetable1639011772304 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'bigint',
+            type: 'int',
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'increment',
@@ -28,7 +28,7 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 'max_download_count',
             isNullable: true,
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 'last_download_at',
@@ -37,23 +37,23 @@ export class Filetable1639011772304 implements MigrationInterface {
           },
           {
             name: 'download_count',
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 'user_id',
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 'chunk_size',
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 'chunk_count',
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 'filesize',
-            type: 'bigint',
+            type: 'int',
           },
           {
             name: 's3_status',
