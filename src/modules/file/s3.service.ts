@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
-import { AWSError } from 'aws-sdk/lib/error';
 import { Readable } from 'stream';
 
 @Injectable()
@@ -19,14 +18,11 @@ export class S3Service {
     ContentType: string,
     filename: string,
   ): Promise<S3.Types.CreateMultipartUploadOutput> {
-    return new Promise((res, rej) => this.s3.createMultipartUpload(
-      {
-        Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-        Key: filename,
-        ContentType,
-      },
-      (err: AWSError, data: S3.Types.CreateMultipartUploadOutput) => (err ? rej(err) : res(data)),
-    ));
+    return this.s3.createMultipartUpload({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      ContentType,
+    }).promise();
   }
 
   chunk({
@@ -58,18 +54,12 @@ export class S3Service {
     MultipartUpload: any;
     filename: string;
   }): Promise<S3.Types.CompleteMultipartUploadOutput> {
-    return new Promise((res, rej) => this.s3.completeMultipartUpload(
-      {
-        UploadId,
-        Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-        Key: filename,
-        MultipartUpload,
-      },
-      (err: AWSError, data) => {
-        if (err) rej(err);
-        res(data);
-      },
-    ));
+    return this.s3.completeMultipartUpload({
+      UploadId,
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      MultipartUpload,
+    }).promise();
   }
 
   download({
@@ -89,15 +79,9 @@ export class S3Service {
   }: {
     filename: string;
   }): Promise<S3.Types.GetObjectOutput> {
-    return new Promise((res, rej) => this.s3.deleteObject(
-      {
-        Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-        Key: filename,
-      },
-      (err: AWSError, data) => {
-        if (err) rej(err);
-        res(data);
-      },
-    ));
+    return this.s3.deleteObject({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+    }).promise();
   }
 }
