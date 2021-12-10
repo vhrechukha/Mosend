@@ -30,7 +30,6 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 'maxDownloadCount',
             type: 'int4',
-            isNullable: false,
           },
           {
             name: 'lastDownloadAt',
