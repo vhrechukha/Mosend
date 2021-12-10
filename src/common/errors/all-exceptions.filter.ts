@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { QueryFailedError } from 'typeorm';
+import { EntityNotFoundError } from 'typeorm';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -14,17 +14,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    let message = (exception as any)?.message?.message;
-    let code = 'HttpException';
+    let message: string;
+    let code: number;
     let status: HttpStatus;
 
     switch (exception.constructor) {
-      case HttpException:
-        status = (exception as HttpException).getStatus();
-        break;
-      case QueryFailedError:
+      case EntityNotFoundError:
         status = HttpStatus.UNPROCESSABLE_ENTITY;
-        message = (exception as QueryFailedError).message;
+        message = (exception as EntityNotFoundError).message;
         code = (exception as any).code;
         break;
       default:
