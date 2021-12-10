@@ -1,5 +1,5 @@
 import {
-  Entity, Column, PrimaryGeneratedColumn, OneToMany,
+  Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { File } from '../../file/entities/file.entity';
@@ -8,9 +8,6 @@ import { File } from '../../file/entities/file.entity';
 export class User {
   @PrimaryGeneratedColumn()
     id: number;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    timestamp: Date;
 
   @Column('text')
     name: string;
@@ -24,4 +21,17 @@ export class User {
 
   @OneToMany(() => File, (file) => file.id)
     file: File[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+    created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+    updated_at: Date;
 }
