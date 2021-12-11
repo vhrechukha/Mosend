@@ -1,6 +1,4 @@
-import {
-  Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '../../modules/auth/auth.service';
 import { UserService } from '../../modules/user/user.service';
@@ -20,16 +18,7 @@ export class AuthMiddleware implements CanActivate {
     );
 
     if (payload?.sub) {
-      const user = await this.userService.findOneById(payload.sub);
-
-      if (user?.suspended) {
-        throw new HttpException(
-          'This user was suspended.',
-          HttpStatus.FORBIDDEN,
-        );
-      }
-
-      request.user = user;
+      request.user = await this.userService.findOneById(payload.sub);
     }
 
     return payload;

@@ -42,22 +42,6 @@ export class UserTable1638217974847 implements MigrationInterface {
             type: 'text',
             isNullable: false,
           },
-          {
-            name: 'suspended',
-            type: 'boolean',
-            default: false,
-            isNullable: false,
-          },
-          {
-            name: 'suspendedAt',
-            type: 'timestamp',
-            isNullable: true,
-          },
-          {
-            name: 'suspensionReason',
-            type: 'text',
-            isNullable: true,
-          },
         ],
       }),
       false,
