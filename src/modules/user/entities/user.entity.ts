@@ -26,10 +26,10 @@ export class User {
     suspended: string;
 
   @Column({ type: 'timestamp', nullable: true })
-    suspendedAt: Date;
+    suspended_at: Date;
 
   @Column('text', { nullable: true })
-    suspensionReason: string;
+    suspension_reason: string;
 
   @CreateDateColumn({
     type: 'timestamp',

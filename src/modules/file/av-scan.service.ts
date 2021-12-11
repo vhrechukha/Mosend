@@ -41,7 +41,7 @@ export class AvScanService {
           scan_detection_info: String(...viruses),
         });
 
-        const user = await this.userService.findOneById(fileDb.user_id);
+        const user = await this.userService.findOneById(fileDb.user);
         await this.userService.updateData({
           ...user,
           suspended: true,

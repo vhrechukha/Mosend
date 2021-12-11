@@ -3,7 +3,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
-import { Readable } from 'stream';
 import { AvScanService } from './av-scan.service';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
@@ -38,7 +37,7 @@ export class FileController {
 
     return this.fileService.save({
       ...data,
-      user_id: user.id,
+      user: user.id,
       s3_path: UploadId,
     });
   }
@@ -61,7 +60,8 @@ export class FileController {
     return this.s3Service.chunk({
       UploadId: file.s3_path,
       PartNumber: data.partNumber,
-      Body: Readable.from(data.body),
+      ContentLength: data.contentLength,
+      Body: data.body,
       filename: file.filename,
     });
   }

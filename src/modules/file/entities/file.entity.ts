@@ -50,11 +50,8 @@ export class File {
     chunk_size: number;
 
   @ManyToOne(() => User, (user) => user.id)
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
     user: User;
-
-  @Column()
-    user_id: number;
 
   @Column({ nullable: true })
     download_count: number;
