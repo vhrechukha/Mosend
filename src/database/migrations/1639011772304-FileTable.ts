@@ -3,10 +3,12 @@ import {
 } from 'typeorm';
 
 export class Filetable1639011772304 implements MigrationInterface {
+  private table: 'files';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'files',
+        name: this.table,
         columns: [
           {
             name: 'id',
@@ -91,6 +93,6 @@ export class Filetable1639011772304 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.query('DROP TABLE files');
+    queryRunner.dropTable(this.table);
   }
 }
