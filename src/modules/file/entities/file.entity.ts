@@ -33,7 +33,7 @@ export class File {
   @Column()
     content_type: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Exclude({ toPlainOnly: true })
     s3_path: string;
 
