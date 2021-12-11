@@ -31,6 +31,9 @@ export class User {
   @Column('text', { nullable: true })
     suspension_reason: string;
 
+  @Column('boolean', { nullable: false, default: false })
+    is_verified: boolean;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

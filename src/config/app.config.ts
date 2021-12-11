@@ -2,6 +2,7 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('application', () => ({
   port: process.env.APP_PORT,
+  backend_host: process.env.BACKEND_HOST,
   db_host: process.env.DB_HOST,
   db_password: process.env.DB_PASSWORD,
   db_database: process.env.DB_DATABASE,

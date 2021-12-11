@@ -20,13 +20,14 @@ export class AuthService {
     );
   }
 
-  async login(user) {
+  async signToken(user, expiresIn) {
     return {
-      access_token: this.jwtService.sign(
+      token: this.jwtService.sign(
         {},
         {
           subject: user.id.toString(),
           jwtid: v4(),
+          expiresIn,
         },
       ),
     };
