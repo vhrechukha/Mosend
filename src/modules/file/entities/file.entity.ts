@@ -33,8 +33,8 @@ export class File {
   @Column()
     content_type: string;
 
-  @Column()
-  @Exclude({ toPlainOnly: true, nullable: true })
+  @Column({ nullable: true })
+  @Exclude({ toPlainOnly: true })
     s3_path: string;
 
   @Column({ default: 'in_progress' })

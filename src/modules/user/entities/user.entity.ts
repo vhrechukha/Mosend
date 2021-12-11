@@ -20,18 +20,16 @@ export class User {
     password: string;
 
   @OneToMany(() => File, (file) => file.id)
-  file: File[];
+    file: File[];
 
   @Column('boolean', { default: false })
-  suspended: string;
+    suspended: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  suspendedAt: Date;
+    suspendedAt: Date;
 
   @Column('text', { nullable: true })
-  suspensionReason: string;
-
-    file: File[];
+    suspensionReason: string;
 
   @CreateDateColumn({
     type: 'timestamp',
