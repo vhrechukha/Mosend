@@ -1,4 +1,6 @@
-import {Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus} from '@nestjs/common';
+import {
+  Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '../../modules/auth/auth.service';
 import { UserService } from '../../modules/user/user.service';
