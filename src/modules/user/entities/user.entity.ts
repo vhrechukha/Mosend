@@ -24,4 +24,13 @@ export class User {
 
   @OneToMany(() => File, (file) => file.id)
     file: File[];
+
+  @Column('boolean', { default: false })
+    suspended: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+    suspendedAt: Date;
+
+  @Column('text', { nullable: true })
+    suspensionReason: string;
 }

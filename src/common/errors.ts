@@ -3,6 +3,7 @@ enum AppError {
 }
 
 enum UserError {
+  UserSuspended = 'This user was suspended.',
   PasswordOrEmailIsIncorrect = 'Password or email is incorrect.',
   UserWithEmailNotFound = 'User with this email not found.',
   UserIsAlreadyExists = 'User is already exists.',

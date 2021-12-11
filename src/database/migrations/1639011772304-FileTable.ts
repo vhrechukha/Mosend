@@ -62,6 +62,7 @@ export class Filetable1639011772304 implements MigrationInterface {
           },
           {
             name: 's3_path',
+            isNullable: true,
             type: 'text',
           },
           {
