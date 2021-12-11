@@ -7,15 +7,17 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { RegisterDto } from '../user/dto/register.dto';
 import { LoginDto } from '../user/dto/login.dto';
 
-import { UserD } from '../../common/decorators/user.decorator';
+import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+
+import { UserError } from '../../common/errors';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +32,7 @@ export class AuthController {
 
     if (!user) {
       throw new HttpException(
-        'User with this email not found.',
+        UserError.UserWithEmailNotFound,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -49,7 +51,7 @@ export class AuthController {
 
     if (userExists) {
       throw new HttpException(
-        'User is already exists.',
+        UserError.UserIsAlreadyExists,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -66,7 +68,7 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/me')
-  me(@UserD() user: User) {
+  me(@CurrentUser() user: User) {
     return pick(user, ['email', 'name']);
   }
 }

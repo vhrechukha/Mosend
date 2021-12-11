@@ -1,14 +1,16 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
 export class UserTable1638217974847 implements MigrationInterface {
+  private table: 'users';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: this.table,
         columns: [
           {
             name: 'id',
-            type: 'int4',
+            type: 'int',
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'increment',
@@ -63,6 +65,6 @@ export class UserTable1638217974847 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.query(`DROP TABLE users`);
+    queryRunner.dropTable(this.table);
   }
 }

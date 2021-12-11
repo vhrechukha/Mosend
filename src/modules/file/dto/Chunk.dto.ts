@@ -8,12 +8,12 @@ export class ChunkDto {
     default: 5,
   })
   @IsNotEmpty()
-  partNumber: number;
+    partNumber: number;
 
   @ApiProperty({
     required: true,
     default: 'some text',
   })
   @IsNotEmpty()
-  body: Buffer | Uint8Array | Blob | string | Readable;
+    body: Readable;
 }

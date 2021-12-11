@@ -7,89 +7,92 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
+
 import { User } from '../../user/entities/user.entity';
 
 export enum ScanResult {
   MALICIOUS = 'MALICIOUS',
   PASSED = 'PASSED',
-  NOSCAN = 'NOSCAN'
+  NOSCAN = 'NOSCAN',
 }
 
-export type S3Status = 'inProgress' | 'finished';
+export type S3Status = 'in_progress' | 'finished';
 
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @Column()
-  filename: string;
+    filename: string;
 
   @Column()
-  extension: string;
+    extension: string;
 
   @Column()
-  contentType: string;
-
-  @Column({ nullable: true })
-  s3_path: string;
-
-  @Column({ default: 'inProgress' })
-  s3_status: S3Status;
+    content_type: string;
 
   @Column()
-  filesize: string;
+  @Exclude({ toPlainOnly: true, nullable: true })
+    s3_path: string;
+
+  @Column({ default: 'in_progress' })
+    s3_status: S3Status;
 
   @Column()
-  chunkCount: number;
+    filesize: string;
 
   @Column()
-  chunkSize: number;
+    chunk_count: number;
+
+  @Column()
+    chunk_size: number;
 
   @ManyToOne(() => User, (user) => user.id)
   @JoinColumn()
-  user: User;
+    user: User;
 
   @Column()
-  user_id: number;
+    user_id: number;
 
   @Column({ nullable: true })
-  downloadCount: number;
+    download_count: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  lastDownloadAt: Date;
+    last_download_at: Date;
 
   @Column({ nullable: true })
-  maxDownloadCount: number;
+    max_download_count: number;
+
+  @Column({
+    type: 'enum',
+    enum: ScanResult,
+    default: ScanResult.NOSCAN,
+  })
+    scan_result: ScanResult;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    nullable: true,
+  })
+    last_scan_date: Date;
+
+  @Column({
+    nullable: true,
+  })
+    scan_detection_info: string;
 
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
-  createdAt: Date;
+    created_at: Date;
 
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
-  updated_at: Date;
-
-  @Column({
-    type: 'enum',
-    enum: ScanResult,
-    default: ScanResult.NOSCAN
-  })
-  scan_result: ScanResult;
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    nullable: true,
-  })
-  last_scan_date: Date;
-
-  @Column({
-    nullable: true,
-  })
-  scan_detection_info: string;
+    updated_at: Date;
 }

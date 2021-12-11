@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from '@nestjs/common';
 
 import { S3Service } from './s3.service';
 import { FileService } from './file.service';
@@ -58,4 +58,7 @@ export class AvScanService {
 
         return fileDb;
     }
+
+    return fileDb;
+  }
 }

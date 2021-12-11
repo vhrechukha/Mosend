@@ -1,22 +1,23 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { File } from '../../file/entities/file.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  timestamp: Date;
+    id: number;
 
   @Column('text')
-  name: string;
+    name: string;
 
   @Column('text')
-  email: string;
+    email: string;
 
   @Column('text')
-  password: string;
+  @Exclude({ toPlainOnly: true })
+    password: string;
 
   @OneToMany(() => File, (file) => file.id)
   file: File[];
@@ -29,4 +30,19 @@ export class User {
 
   @Column('text', { nullable: true })
   suspensionReason: string;
+
+    file: File[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+    created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+    updated_at: Date;
 }

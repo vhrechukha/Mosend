@@ -8,12 +8,12 @@ export class LoginDto {
   })
   @IsNotEmpty()
   @IsEmail()
-  email: number;
+    email: number;
 
   @ApiProperty({
     required: true,
     default: 'someSecurePassword123',
   })
   @IsNotEmpty()
-  password: string;
+    password: string;
 }

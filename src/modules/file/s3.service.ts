@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
-import { AWSError } from 'aws-sdk/lib/error';
 import { Readable } from 'stream';
-import stream from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -20,20 +18,14 @@ export class S3Service {
     ContentType: string,
     filename: string,
   ): Promise<S3.Types.CreateMultipartUploadOutput> {
-    return new Promise((res, rej) =>
-      this.s3.createMultipartUpload(
-        {
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-          ContentType,
-        },
-        (err: AWSError, data: S3.Types.CreateMultipartUploadOutput) =>
-          err ? rej(err) : res(data),
-      ),
-    );
+    return this.s3.createMultipartUpload({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      ContentType,
+    }).promise();
   }
 
-  async chunk({
+  chunk({
     UploadId,
     PartNumber,
     Body,
@@ -41,26 +33,16 @@ export class S3Service {
   }: {
     UploadId: string;
     PartNumber: number;
-    Body: Buffer | Uint8Array | Blob | string | Readable;
+    Body: Readable;
     filename: string;
-  }): Promise<S3.Types.UploadPartOutput> {
-    return new Promise((res, rej) =>
-      this.s3.uploadPart(
-        {
-          Body,
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-          PartNumber,
-          UploadId,
-        },
-        (err: AWSError, data) => {
-          if (err) {
-            rej(err);
-          }
-          res({ ...data });
-        },
-      ),
-    );
+  }) {
+    return this.s3.upload({
+      Body,
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      PartNumber,
+      UploadId,
+    }).promise();
   }
 
   async finalize({
@@ -72,70 +54,46 @@ export class S3Service {
     MultipartUpload: any;
     filename: string;
   }): Promise<S3.Types.CompleteMultipartUploadOutput> {
-    return new Promise((res, rej) =>
-      this.s3.completeMultipartUpload(
-        {
-          UploadId,
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-          MultipartUpload,
-        },
-        (err: AWSError, data) => {
-          if (err) rej(err);
-          res(data);
-        },
-      ),
-    );
+    return this.s3.completeMultipartUpload({
+      UploadId,
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+      MultipartUpload,
+    }).promise();
   }
 
-  async download({
+  download({
     filename,
   }: {
     extension?: string;
     filename: string;
-  }): Promise<S3.Types.GetObjectOutput> {
-    return new Promise((res, rej) =>
-      this.s3.getObject(
-        {
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-        },
-        (err: AWSError, data) => {
-          if (err) rej(err);
-          res(data);
-        },
-      ),
-    );
+  }) {
+    return this.s3.getObject({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+    }).createReadStream();
   }
 
-    downloadReadStream({
-       filename,
-    }: {
-        extension?: string;
-        filename: string;
-    }): stream.Readable {
-      return this.s3.getObject({
-            Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-            Key: filename,
-       }).createReadStream();
-    }
+  downloadReadStream({
+    filename,
+  }: {
+    extension?: string;
+    filename: string;
+  }): Readable {
+    return this.s3.getObject({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+    }).createReadStream();
+  }
 
   delete({
     filename,
   }: {
     filename: string;
   }): Promise<S3.Types.GetObjectOutput> {
-    return new Promise((res, rej) =>
-      this.s3.deleteObject(
-        {
-          Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-          Key: filename,
-        },
-        (err: AWSError, data) => {
-          if (err) rej(err);
-          res(data);
-        },
-      ),
-    );
+    return this.s3.deleteObject({
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: filename,
+    }).promise();
   }
 }

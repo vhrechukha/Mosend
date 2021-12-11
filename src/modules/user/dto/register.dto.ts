@@ -8,19 +8,19 @@ export class RegisterDto {
   })
   @IsNotEmpty()
   @IsString()
-  name: string;
+    name: string;
 
   @ApiProperty({
     required: true,
     default: 'cat@email.com',
   })
   @IsEmail()
-  email: number;
+    email: number;
 
   @ApiProperty({
     required: true,
     default: 'someSecurePassword123',
   })
   @IsNotEmpty()
-  password: string;
+    password: string;
 }
