@@ -51,7 +51,7 @@ export class AuthService {
 
     urlObj.searchParams.set('expiresAt', (new Date().getTime() + expiresInMs).toString(10));
 
-    const signature = this._createUrlSignature(urlObj);
+    const signature = this.createUrlSignature(urlObj);
 
     urlObj.searchParams.set('signature', signature);
 
@@ -68,7 +68,7 @@ export class AuthService {
     const urlSignature = urlObj.searchParams.get('signature');
     urlObj.searchParams.delete('signature');
 
-    const currentUrlSignature = this._createUrlSignature(urlObj);
+    const currentUrlSignature = this.createUrlSignature(urlObj);
 
     if (currentUrlSignature !== urlSignature) {
       throw new HttpException(
@@ -80,7 +80,7 @@ export class AuthService {
     return true;
   }
 
-  private _createUrlSignature(urlObj: URL): string {
+  private createUrlSignature(urlObj: URL): string {
     return crypto
       .createHmac('SHA256', this.configService.get('APP_CRYPTO_SECRET'))
       .update(urlObj.toString())
