@@ -5,7 +5,7 @@ import { Request } from 'express';
 
 import { AuthService } from '../../modules/auth/auth.service';
 import { UserService } from '../../modules/user/user.service';
-import { UserError } from '../errors';
+import { EmailError, UserError } from '../errors';
 
 @Injectable()
 export class AuthMiddleware implements CanActivate {
@@ -27,6 +27,13 @@ export class AuthMiddleware implements CanActivate {
       if (user?.suspended) {
         throw new HttpException(
           UserError.UserSuspended,
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (!user?.is_verified) {
+        throw new HttpException(
+          EmailError.EmailIsNotVerified,
           HttpStatus.FORBIDDEN,
         );
       }

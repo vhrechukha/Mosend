@@ -105,13 +105,6 @@ export class AuthController {
       );
     }
 
-    if (!userDb?.is_verified) {
-      throw new HttpException(
-        EmailError.EmailIsNotVerified,
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     await this.authService.validate({
       password: data.password,
       hashPassword: userDb.password,
