@@ -25,11 +25,11 @@ export class FileService {
     });
   }
 
-  findByIdAndUserId(chunkId, user_id) {
+  findByIdAndUserId(chunkId, user) {
     return this.repository.findOne({
       where: {
         id: chunkId,
-        user_id,
+        user,
       },
     });
   }

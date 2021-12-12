@@ -5,9 +5,12 @@ import {
   Post,
   UseGuards,
   HttpException,
-  HttpStatus,
+  HttpStatus, Get, Query, Req,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -17,13 +20,18 @@ import { LoginDto } from '../user/dto/login.dto';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 
-import { UserError } from '../../common/errors';
+import { EmailError, UserError } from '../../common/errors';
+import { EmailService } from '../email/email.service';
+import { Emails } from '../email/email.templates';
+import { AuthResponse } from '../../common/responses';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    private configService: ConfigService,
     private authService: AuthService,
     private userService: UserService,
+    private emailService: EmailService,
   ) {}
 
   @Post('/login')
@@ -37,12 +45,19 @@ export class AuthController {
       );
     }
 
+    if (!user?.is_verified) {
+      throw new HttpException(
+        EmailError.EmailIsNotVerified,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     await this.authService.validate({
       password: data.password,
       hashPassword: user.password,
     });
 
-    return this.authService.login(user);
+    return this.authService.signToken(user, 360000);
   }
 
   @Post('/register')
@@ -62,7 +77,17 @@ export class AuthController {
       name: data.name,
     });
 
-    return this.authService.login(user);
+    const link = this.authService.signUrl(
+      `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?id=${user.id}`,
+      180000,
+    );
+
+    const options = Emails.verificationEmail(data.email, link);
+    await this.emailService.send(options);
+
+    return {
+      message: AuthResponse.SuccessfullySignedUp,
+    };
   }
 
   @ApiBearerAuth()
@@ -70,5 +95,22 @@ export class AuthController {
   @Post('/me')
   me(@CurrentUser() user: User) {
     return pick(user, ['email', 'name']);
+  }
+
+  @Get('/verifyEmail')
+  async verifyEmail(@Req() req: Request, @Query('id') id: number) {
+    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+
+    const user = await this.userService.findOneById(id);
+
+    await this.userService.updateData({
+      ...user,
+      is_verified: true,
+      verified_at: new Date(),
+    });
+
+    return {
+      message: AuthResponse.SuccessfullyVerified,
+    };
   }
 }

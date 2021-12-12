@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
 export class UserTable1638217974847 implements MigrationInterface {
-  private table: 'users';
+  private table = 'users';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -49,13 +49,23 @@ export class UserTable1638217974847 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'suspendedAt',
+            name: 'suspended_at',
             type: 'timestamp',
             isNullable: true,
           },
           {
-            name: 'suspensionReason',
+            name: 'suspension_reason',
             type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'is_verified',
+            type: 'boolean',
+            default: false,
+          },
+          {
+            name: 'verified_at',
+            type: 'timestamp',
             isNullable: true,
           },
         ],
@@ -64,7 +74,7 @@ export class UserTable1638217974847 implements MigrationInterface {
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.dropTable(this.table);
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropTable(this.table);
   }
 }

@@ -16,4 +16,11 @@ export class ChunkDto {
   })
   @IsNotEmpty()
     body: Readable;
+
+  @ApiProperty({
+    required: true,
+    default: '15',
+  })
+  @IsNotEmpty()
+    contentLength: number;
 }

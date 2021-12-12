@@ -26,10 +26,16 @@ export class User {
     suspended: string;
 
   @Column({ type: 'timestamp', nullable: true })
-    suspendedAt: Date;
+    suspended_at: Date;
 
   @Column('text', { nullable: true })
-    suspensionReason: string;
+    suspension_reason: string;
+
+  @Column('boolean', { nullable: false, default: false })
+    is_verified: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+    verified_at: Date;
 
   @CreateDateColumn({
     type: 'timestamp',

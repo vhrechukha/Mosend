@@ -25,7 +25,7 @@ export class AvScanService {
         file,
         isInfected,
         viruses,
-      } = await this.avScan.scanStream(this.s3Service.downloadReadStream({ filename: fileDb.filename }));
+      } = await this.avScan.scanStream(this.s3Service.download({ filename: fileDb.filename }));
 
       if (isInfected) {
         await this.s3Service.delete({
@@ -41,7 +41,7 @@ export class AvScanService {
           scan_detection_info: String(...viruses),
         });
 
-        const user = await this.userService.findOneById(fileDb.user_id);
+        const user = await this.userService.findOneById(fileDb.user);
         await this.userService.updateData({
           ...user,
           suspended: true,

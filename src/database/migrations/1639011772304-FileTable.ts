@@ -3,7 +3,7 @@ import {
 } from 'typeorm';
 
 export class Filetable1639011772304 implements MigrationInterface {
-  private table: 'files';
+  private table = 'files';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -39,6 +39,7 @@ export class Filetable1639011772304 implements MigrationInterface {
           },
           {
             name: 'download_count',
+            isNullable: true,
             type: 'int',
           },
           {
@@ -52,6 +53,21 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 'chunk_count',
             type: 'int',
+          },
+          {
+            name: 'scan_result',
+            isNullable: true,
+            type: 'text',
+          },
+          {
+            name: 'last_scan_date',
+            isNullable: true,
+            type: 'timestamp',
+          },
+          {
+            name: 'scan_detection_info',
+            isNullable: true,
+            type: 'text',
           },
           {
             name: 'filesize',
@@ -92,7 +108,7 @@ export class Filetable1639011772304 implements MigrationInterface {
     }));
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
-    queryRunner.dropTable(this.table);
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.dropTable(this.table);
   }
 }

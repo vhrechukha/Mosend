@@ -30,14 +30,19 @@ export class S3Service {
     PartNumber,
     Body,
     filename,
+    ContentLength,
   }: {
     UploadId: string;
     PartNumber: number;
     Body: Readable;
     filename: string;
+    ContentLength: number;
   }) {
-    return this.s3.upload({
-      Body,
+    const body = Readable.from(Body);
+
+    return this.s3.uploadPart({
+      Body: body,
+      ContentLength,
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
       Key: filename,
       PartNumber,
@@ -68,18 +73,6 @@ export class S3Service {
     extension?: string;
     filename: string;
   }) {
-    return this.s3.getObject({
-      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-      Key: filename,
-    }).createReadStream();
-  }
-
-  downloadReadStream({
-    filename,
-  }: {
-    extension?: string;
-    filename: string;
-  }): Readable {
     return this.s3.getObject({
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
       Key: filename,
