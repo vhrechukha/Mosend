@@ -14,8 +14,6 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
-import { RegisterDto } from '../user/dto/register.dto';
-import { LoginDto } from '../user/dto/login.dto';
 
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
@@ -24,6 +22,10 @@ import { EmailError, UserError } from '../../common/errors';
 import { EmailService } from '../email/email.service';
 import { Emails } from '../email/email.templates';
 import { AuthResponse } from '../../common/responses';
+
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -87,6 +89,41 @@ export class AuthController {
 
     return {
       message: AuthResponse.SuccessfullySignedUp,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Post('/updatePassword')
+  async updatePassword(@CurrentUser() user: User, @Body() data: UpdatePasswordDto) {
+    const userDb = await this.userService.findOneById(user.id);
+
+    if (!userDb) {
+      throw new HttpException(
+        UserError.UserWithEmailNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!userDb?.is_verified) {
+      throw new HttpException(
+        EmailError.EmailIsNotVerified,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.authService.validate({
+      password: data.password,
+      hashPassword: userDb.password,
+    });
+
+    await this.userService.save({
+      ...userDb,
+      password: data.newPassword,
+    });
+
+    return {
+      message: AuthResponse.PasswordUpdated,
     };
   }
 
