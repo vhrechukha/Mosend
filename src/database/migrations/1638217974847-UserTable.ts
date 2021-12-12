@@ -75,7 +75,6 @@ export class UserTable1638217974847 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    // FIX: dropTable doesn't work
-    await queryRunner.query(`DROP TABLE "${this.table}" CASCADE`);
+    await queryRunner.dropTable(this.table);
   }
 }
