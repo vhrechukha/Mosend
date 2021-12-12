@@ -1,8 +1,9 @@
 import {
-  Controller, Get, HttpException, HttpStatus, Query,
+  Controller, Get, HttpException, HttpStatus, Query, UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { EmailService } from './email.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
@@ -10,6 +11,9 @@ import { AuthService } from '../auth/auth.service';
 import { Emails } from './email.templates';
 import { EmailError } from '../../common/errors';
 import { EmailResponse } from '../../common/responses';
+import { AuthMiddleware } from '../../common/guards/auth.middleware';
+import { CurrentUser } from '../../common/decorators/user.decorator';
+import { User } from '../user/entities/user.entity';
 
 @Controller('email')
 export class EmailController {
@@ -22,7 +26,6 @@ export class EmailController {
 
   @Get('/resendVerificationEmail')
   async resendEmailVerification(
-  // @Param('type') type: EmailTypes, // FEAT: for feature emails which need just to resend
   @Query('email') email: string,
   ) {
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -42,12 +45,29 @@ export class EmailController {
         180000,
       );
 
-      const options = Emails.verificationEmail(email, link);
+      const options = Emails.VerificationOfAccount(email, link);
       await this.emailService.send(options);
     }
 
     return {
-      message: EmailResponse.EmailSent,
+      message: EmailResponse.VerifiedEmailSent,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get('/sendDeletionEmail')
+  async sendDeletionEmail(@CurrentUser() user: User) {
+    const link = this.authService.signUrl(
+      `${this.configService.get('BACKEND_HOST')}/auth/verifyDeletion?id=${user.id}`,
+      180000,
+    );
+
+    const options = Emails.DeletionOfAccount(user.email, link);
+    await this.emailService.send(options);
+
+    return {
+      message: EmailResponse.DeletionEmailSent,
     };
   }
 }
