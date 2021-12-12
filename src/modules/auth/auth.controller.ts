@@ -5,10 +5,12 @@ import {
   Post,
   UseGuards,
   HttpException,
-  HttpStatus, Get, Query,
+  HttpStatus, Get, Query, Req,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
+
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -18,9 +20,10 @@ import { LoginDto } from '../user/dto/login.dto';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 
-import { AppError, EmailError, UserError } from '../../common/errors';
+import { EmailError, UserError } from '../../common/errors';
 import { EmailService } from '../email/email.service';
 import { Emails } from '../email/email.templates';
+import { AuthResponse } from '../../common/responses';
 
 @Controller('auth')
 export class AuthController {
@@ -74,14 +77,16 @@ export class AuthController {
       name: data.name,
     });
 
-    const { token } = await this.authService.signToken(user, 360);
-    const link = `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?token=${token}`;
+    const link = this.authService.signUrl(
+      `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?id=${user.id}`,
+      180000,
+    );
 
     const options = Emails.verificationEmail(data.email, link);
     await this.emailService.send(options);
 
     return {
-      message: 'You logged in successfully. Please, verify your email at first.',
+      message: AuthResponse.SuccessfullySignedUp,
     };
   }
 
@@ -93,32 +98,19 @@ export class AuthController {
   }
 
   @Get('/verifyEmail')
-  async verifyEmail(@Query('token') token: string) {
-    const payload = await this.authService.verifyToken(token);
+  async verifyEmail(@Req() req: Request, @Query('id') id: number) {
+    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
 
-    if (!payload?.sub) {
-      throw new HttpException(
-        AppError.TokenIsNotActive,
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    const user = await this.userService.findOneById(payload.sub);
-
-    if (user?.suspended) {
-      throw new HttpException(
-        UserError.UserSuspended,
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    const user = await this.userService.findOneById(id);
 
     await this.userService.updateData({
       ...user,
       is_verified: true,
+      verified_at: new Date(),
     });
 
     return {
-      message: 'User was successfully verified. Yet, you can login with your email and password.',
+      message: AuthResponse.SuccessfullyVerified,
     };
   }
 }

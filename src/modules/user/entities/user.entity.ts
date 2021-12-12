@@ -34,6 +34,9 @@ export class User {
   @Column('boolean', { nullable: false, default: false })
     is_verified: boolean;
 
+  @Column({ type: 'timestamp', nullable: true })
+    verified_at: Date;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

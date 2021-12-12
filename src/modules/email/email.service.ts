@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import sgMail from '@sendgrid/mail';
+import { ClientResponse } from '@sendgrid/client/src/response';
 
 @Injectable()
 export class EmailService {
@@ -10,7 +11,7 @@ export class EmailService {
 
   async send({
     to, subject, html,
-  }): Promise<any> {
+  }): Promise<[ClientResponse, unknown]> {
     return sgMail
       .send({
         to,

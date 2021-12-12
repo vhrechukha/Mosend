@@ -9,6 +9,7 @@ import { AuthService } from '../auth/auth.service';
 
 import { Emails } from './email.templates';
 import { EmailError } from '../../common/errors';
+import { EmailResponse } from '../../common/responses';
 
 @Controller('email')
 export class EmailController {
@@ -36,15 +37,17 @@ export class EmailController {
 
     const user = await this.userService.findOneByEmail(email);
     if (user) {
-      const { token } = await this.authService.signToken(user, 5);
-      const link = `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?token=${token}`;
+      const link = this.authService.signUrl(
+        `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?id=${user.id}`,
+        180000,
+      );
 
       const options = Emails.verificationEmail(email, link);
       await this.emailService.send(options);
     }
 
     return {
-      message: 'If user exists in our database, we will resend email verification.',
+      message: EmailResponse.EmailSent,
     };
   }
 }

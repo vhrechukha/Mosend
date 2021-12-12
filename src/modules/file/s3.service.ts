@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
-import * as zlib from 'zlib';
 
 @Injectable()
 export class S3Service {
@@ -39,7 +38,7 @@ export class S3Service {
     filename: string;
     ContentLength: number;
   }) {
-    const body = Readable.from(Body).pipe(zlib.createGzip());
+    const body = Readable.from(Body);
 
     return this.s3.uploadPart({
       Body: body,
@@ -74,18 +73,6 @@ export class S3Service {
     extension?: string;
     filename: string;
   }) {
-    return this.s3.getObject({
-      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-      Key: filename,
-    }).createReadStream();
-  }
-
-  downloadReadStream({
-    filename,
-  }: {
-    extension?: string;
-    filename: string;
-  }): Readable {
     return this.s3.getObject({
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
       Key: filename,

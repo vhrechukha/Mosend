@@ -1,6 +1,8 @@
 enum AppError {
   EnvNotSpecified = 'parameter did not specified in .env file',
   TokenIsNotActive = 'Token is not active.',
+  InvalidSignature = 'Invalid signature or URL is malformed.',
+  UrlExpired = 'URL expired.',
 }
 
 enum UserError {

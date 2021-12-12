@@ -63,6 +63,11 @@ export class UserTable1638217974847 implements MigrationInterface {
             type: 'boolean',
             default: false,
           },
+          {
+            name: 'verified_at',
+            type: 'timestamp',
+            isNullable: true,
+          },
         ],
       }),
       false,
