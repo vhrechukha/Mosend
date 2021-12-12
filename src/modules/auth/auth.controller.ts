@@ -82,7 +82,7 @@ export class AuthController {
       180000,
     );
 
-    const options = Emails.verificationEmail(data.email, link);
+    const options = Emails.VerificationOfAccount(data.email, link);
     await this.emailService.send(options);
 
     return {
@@ -111,6 +111,19 @@ export class AuthController {
 
     return {
       message: AuthResponse.SuccessfullyVerified,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get('/verifyDeletion')
+  async verifyDeletion(@Req() req: Request, @Query('id') id: number) {
+    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+
+    await this.userService.deleteById(id);
+
+    return {
+      message: AuthResponse.SuccessfullyDeleted,
     };
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
@@ -37,5 +37,9 @@ export class UserService {
 
   async findOneById(id) {
     return this.usersRepository.findOne(id);
+  }
+
+  deleteById(id: number): Promise<DeleteResult> {
+    return this.usersRepository.delete(id);
   }
 }
