@@ -14,7 +14,7 @@ export class CronService {
     private userService: UserService,
   ) {}
 
-  @Cron('* * * * * *')
+  @Cron('0 0 0 * * *')
   async handleCron() {
     this.logger.debug(`${new Date()} auto cleanup'`);
 
