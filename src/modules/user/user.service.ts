@@ -44,9 +44,9 @@ export class UserService {
     return this.repository.delete(id);
   }
 
-  deleteMany(days: number) {
+  deleteMany(time: Date) {
     return this.repository.delete({
-      suspended_at: LessThanOrEqual(new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000)),
+      suspended_at: LessThanOrEqual(time),
     });
   }
 }

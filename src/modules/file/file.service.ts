@@ -41,15 +41,15 @@ export class FileService {
     return this.repository.delete(chunkId);
   }
 
-  deleteFilesByLastUpdated(days: number) {
+  deleteFilesByLastUpdated(time: Date) {
     return this.repository.delete({
-      updated_at: LessThanOrEqual(new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000)),
+      updated_at: LessThanOrEqual(time),
     });
   }
 
-  deleteMaliciousFiles(days: number) {
+  deleteMaliciousFiles(time: Date) {
     return this.repository.delete({
-      last_scan_date: LessThanOrEqual(new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000)),
+      last_scan_date: LessThanOrEqual(time),
       scan_result: ScanResult.MALICIOUS,
     });
   }

@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 
 import { UserService } from '../user/user.service';
 import { FileService } from '../file/file.service';
+import { addDaysToCurrentDate } from '../../common/helpers';
 
 @Injectable()
 export class CronService {
@@ -13,14 +14,14 @@ export class CronService {
     private userService: UserService,
   ) {}
 
-  @Cron('0 0 24 * * *')
+  @Cron('* * * * * *')
   async handleCron() {
     this.logger.debug(`${new Date()} auto cleanup'`);
 
-    await this.userService.deleteMany(7);
+    await this.userService.deleteMany(addDaysToCurrentDate(7));
 
-    await this.fileService.deleteFilesByLastUpdated(1);
+    await this.fileService.deleteFilesByLastUpdated(addDaysToCurrentDate(1));
 
-    await this.fileService.deleteMaliciousFiles(7);
+    await this.fileService.deleteMaliciousFiles(addDaysToCurrentDate(7));
   }
 }
