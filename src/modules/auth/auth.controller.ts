@@ -88,7 +88,7 @@ export class AuthController {
     await this.emailService.send(options);
 
     return {
-      message: AuthResponse.SuccessfullySignedUp,
+      message: AuthResponse.SignedUp,
     };
   }
 
@@ -140,7 +140,7 @@ export class AuthController {
     });
 
     return {
-      message: AuthResponse.SuccessfullyVerified,
+      message: AuthResponse.Verified,
     };
   }
 
@@ -153,7 +153,7 @@ export class AuthController {
     await this.userService.deleteById(id);
 
     return {
-      message: AuthResponse.SuccessfullyDeleted,
+      message: AuthResponse.Deleted,
     };
   }
 

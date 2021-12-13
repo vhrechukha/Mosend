@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 
-import { File } from './entities/file.entity';
+import {
+  File,
+  ScanResult,
+} from './entities/file.entity';
 
 @Injectable()
 export class FileService {
@@ -36,5 +39,18 @@ export class FileService {
 
   deleteById(chunkId) {
     return this.repository.delete(chunkId);
+  }
+
+  deleteFilesByLastUpdated(time: Date) {
+    return this.repository.delete({
+      updated_at: LessThanOrEqual(time),
+    });
+  }
+
+  deleteMaliciousFiles(time: Date) {
+    return this.repository.delete({
+      last_scan_date: LessThanOrEqual(time),
+      scan_result: ScanResult.MALICIOUS,
+    });
   }
 }
