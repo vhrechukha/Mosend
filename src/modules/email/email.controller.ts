@@ -8,7 +8,7 @@ import { EmailService } from './email.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 
-import { Emails } from './email.templates';
+import { Emails, EmailsForResetting, pathOfEmailsForResetting } from './email.templates';
 import { EmailError } from '../../common/errors';
 import { EmailResponse } from '../../common/responses';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
@@ -24,9 +24,10 @@ export class EmailController {
     private readonly userService: UserService,
   ) {}
 
-  @Get('/resendVerificationEmail')
-  async resendEmailVerification(
-  @Query('email') email: string,
+  @Get('/resendEmail')
+  async resendEmail(
+    @Query('type') type: EmailsForResetting,
+    @Query('email') email: string,
   ) {
     const emailRegex = /^\S+@\S+\.\S+$/;
     const validatedEmail = emailRegex.test(email);
@@ -41,11 +42,11 @@ export class EmailController {
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       const link = this.authService.signUrl(
-        `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?id=${user.id}`,
+        `${this.configService.get('BACKEND_HOST')}/auth/${pathOfEmailsForResetting[type]}?id=${user.id}`,
         180000,
       );
 
-      const options = Emails.VerificationOfAccount(email, link);
+      const options = Emails[type](email, link);
       await this.emailService.send(options);
     }
 

@@ -156,4 +156,29 @@ export class AuthController {
       message: AuthResponse.SuccessfullyDeleted,
     };
   }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Post('/resetPassword')
+  async resetPassword(@Req() req: Request, @Query('id') id: number, @Body('password') password: string) {
+    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+
+    const userDb = await this.userService.findOneById(id);
+
+    if (!userDb) {
+      throw new HttpException(
+        UserError.UserWithEmailNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.userService.save({
+      ...userDb,
+      password,
+    });
+
+    return {
+      message: AuthResponse.PasswordReset,
+    };
+  }
 }

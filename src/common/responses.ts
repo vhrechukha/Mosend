@@ -3,6 +3,7 @@ enum AuthResponse {
   SuccessfullySignedUp = 'You signed up successfully. Please, verify your email at first.',
   SuccessfullyDeleted = 'User was successfully deleted.',
   PasswordUpdated = 'Password updated successfully.',
+  PasswordReset = 'Password reset successfully.',
 }
 
 enum EmailResponse {

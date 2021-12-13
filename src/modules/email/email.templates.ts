@@ -26,6 +26,14 @@ const Emails = {
   }),
 };
 
+type EmailsForResetting = 'VerificationOfAccount' | 'ResetPasswordOfAccount';
+const pathOfEmailsForResetting = {
+  VerificationOfAccount: 'verifyEmail',
+  ResetPasswordOfAccount: 'resetPassword',
+};
+
 export {
   Emails,
+  EmailsForResetting,
+  pathOfEmailsForResetting,
 };
