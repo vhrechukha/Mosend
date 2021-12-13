@@ -19,10 +19,9 @@ export class UserService {
     });
   }
 
-  async save({ email, password, name }) {
+  async save({ password, ...data }) {
     return this.usersRepository.save({
-      email,
-      name,
+      ...data,
       password: await bcrypt.hash(password, 10),
     });
   }
