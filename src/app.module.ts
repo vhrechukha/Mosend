@@ -14,11 +14,13 @@ import { AuthModule } from './modules/auth/auth.module';
 import { FileModule } from './modules/file/file.module';
 import { EmailModule } from './modules/email/email.module';
 import { CronModule } from './modules/cron/cron.module';
+import { BullProviderModule } from './providers/bull.provider';
 
 @Module({
   imports: [
     AppConfigModule,
     DbProviderModule,
+    BullProviderModule,
     UserModule,
     AuthModule,
     RedisCacheModule,

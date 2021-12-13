@@ -1,24 +1,38 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
+import {
+  OnQueueCompleted, Process, Processor,
+} from '@nestjs/bull';
+import { Job } from 'bull';
 
 import { S3Service } from './s3.service';
 import { FileService } from './file.service';
 import { ScanResult, File } from './entities/file.entity';
 import { UserService } from '../user/user.service';
 
-@Injectable()
-export class AvScanService {
+@Processor('av-scan')
+export class AvScanProcessor {
+  private readonly logger = new Logger(AvScanProcessor.name);
+
   constructor(
     private readonly s3Service: S3Service,
     private readonly userService: UserService,
     private readonly fileService: FileService,
     @Inject('clamscan') private avScan,
-  ) {
+  ) {}
+
+  @OnQueueCompleted()
+  async onQueueCompleted(jobId: number, result: any) {
+    // FEAT: added action for front-end when file checked
+    return result;
   }
 
-  async check(id: number): Promise<File> {
-    const fileDb = await this.fileService.findById(id);
+  @Process('check')
+  async check(job: Job) {
+    this.logger.debug(`${new Date()} av started scanning, id: ${job.data.id}`);
 
-    if (fileDb.scan_result !== ScanResult.PASSED) {
+    const fileDb = await this.fileService.findById(job.data.id);
+
+    if (fileDb && fileDb.scan_result !== ScanResult.PASSED) {
       let result: File;
 
       const {
@@ -56,9 +70,12 @@ export class AvScanService {
           last_scan_date: new Date(),
         });
       }
+      this.logger.debug(`${new Date()} av scanned, id: ${job.data.id}`);
 
       return result;
     }
+
+    this.logger.debug(`${new Date()} av scanned, id: ${job.data.id}`);
 
     return fileDb;
   }

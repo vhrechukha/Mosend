@@ -11,4 +11,8 @@ enum EmailResponse {
   DeletionEmailSent = 'Email with deletion link sent. Check your mail.',
 }
 
-export { AuthResponse, EmailResponse };
+enum FileResponse {
+  AddedForCheck = 'File was successfully added for check.',
+}
+
+export { AuthResponse, EmailResponse, FileResponse };

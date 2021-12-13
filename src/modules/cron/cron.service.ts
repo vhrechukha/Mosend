@@ -16,7 +16,7 @@ export class CronService {
 
   @Cron('0 0 0 * * *')
   async handleCron() {
-    this.logger.debug(`${new Date()} auto cleanup'`);
+    this.logger.debug(`${new Date()} auto cleanup`);
 
     await this.userService.deleteMany(addDaysToCurrentDate(7));
 
