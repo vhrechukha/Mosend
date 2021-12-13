@@ -15,17 +15,19 @@ import { FileModule } from './modules/file/file.module';
 import { EmailModule } from './modules/email/email.module';
 import { CronModule } from './modules/cron/cron.module';
 import { BullProviderModule } from './providers/bull.provider';
+import { ReportModule } from './modules/report/report.module';
 
 @Module({
   imports: [
     AppConfigModule,
     DbProviderModule,
     BullProviderModule,
+    ReportModule,
     UserModule,
     AuthModule,
-    RedisCacheModule,
     FileModule,
     EmailModule,
+    RedisCacheModule,
     ScheduleModule.forRoot(),
     CronModule,
   ],

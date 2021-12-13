@@ -5,6 +5,7 @@ import { AppConfigService } from '../config/app.config.service';
 import { AppConfigModule } from '../config/app.config.module';
 import { User } from '../modules/user/entities/user.entity';
 import { File } from '../modules/file/entities/file.entity';
+import { Report } from '../modules/report/entitites/Report.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { File } from '../modules/file/entities/file.entity';
         username: appConfigService.get('DB_USERNAME'),
         password: appConfigService.get('DB_PASSWORD'),
         database: appConfigService.get('DB_DATABASE'),
-        entities: [User, File],
+        entities: [User, File, Report],
         migrations: ['dist/database/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_typeorm',
         migrationsRun: true,

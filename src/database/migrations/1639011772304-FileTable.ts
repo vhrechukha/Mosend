@@ -100,7 +100,7 @@ export class Filetable1639011772304 implements MigrationInterface {
       false,
     );
 
-    await queryRunner.createForeignKey('files', new TableForeignKey({
+    await queryRunner.createForeignKey(this.table, new TableForeignKey({
       columnNames: ['user_id'],
       referencedColumnNames: ['id'],
       referencedTableName: 'users',
