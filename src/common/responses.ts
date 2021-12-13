@@ -12,7 +12,7 @@ enum EmailResponse {
 }
 
 enum FileResponse {
-  AddedForCheck = 'File was successfully added for check.',
+  ScheduledForCheck = 'File was successfully scheduled for check.',
 }
 
 export { AuthResponse, EmailResponse, FileResponse };

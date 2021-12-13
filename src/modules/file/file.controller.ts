@@ -141,7 +141,7 @@ export class FileController {
     });
 
     return {
-      message: FileResponse.AddedForCheck,
+      message: FileResponse.ScheduledForCheck,
     };
   }
 }
