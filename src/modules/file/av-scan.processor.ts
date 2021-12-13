@@ -8,6 +8,7 @@ import { S3Service } from './s3.service';
 import { FileService } from './file.service';
 import { ScanResult, File } from './entities/file.entity';
 import { UserService } from '../user/user.service';
+import { addDaysToCurrentDate } from '../../common/helpers';
 
 @Processor('av-scan')
 export class AvScanProcessor {
@@ -32,7 +33,11 @@ export class AvScanProcessor {
 
     const fileDb = await this.fileService.findById(job.data.id);
 
-    if (fileDb && fileDb.scan_result !== ScanResult.PASSED) {
+    if (!fileDb) {
+      return null;
+    }
+
+    if (fileDb.scan_result !== ScanResult.PASSED || fileDb.last_scan_date <= addDaysToCurrentDate(1)) {
       let result: File;
 
       const {
