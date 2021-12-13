@@ -4,6 +4,7 @@ import { S3Service } from './s3.service';
 import { FileService } from './file.service';
 import { ScanResult, File } from './entities/file.entity';
 import { UserService } from '../user/user.service';
+import { addDaysToCurrentDate } from '../../common/helpers';
 
 @Injectable()
 export class AvScanService {
@@ -18,7 +19,7 @@ export class AvScanService {
   async check(id: number): Promise<File> {
     const fileDb = await this.fileService.findById(id);
 
-    if (fileDb.scan_result !== ScanResult.PASSED) {
+    if (fileDb.scan_result !== ScanResult.PASSED || fileDb.last_scan_date <= addDaysToCurrentDate(1)) {
       let result: File;
 
       const {
@@ -46,12 +47,12 @@ export class AvScanService {
           ...user,
           suspended: true,
           suspendedAt: new Date(),
-          suspensionReason: String(...viruses), // is this what means by suspended reason for user?
+          suspensionReason: String(...viruses),
         });
       } else if (!isInfected) {
         result = await this.fileService.save({
-          ...file,
           ...fileDb,
+          ...file,
           scan_result: ScanResult.PASSED,
           last_scan_date: new Date(),
         });
