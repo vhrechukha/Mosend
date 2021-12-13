@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import {
+  DeleteResult, LessThanOrEqual, Repository,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './entities/user.entity';
@@ -40,5 +42,11 @@ export class UserService {
 
   deleteById(id: number): Promise<DeleteResult> {
     return this.usersRepository.delete(id);
+  }
+
+  deleteMany(days: number) {
+    return this.usersRepository.delete({
+      suspended_at: LessThanOrEqual(new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000)),
+    });
   }
 }

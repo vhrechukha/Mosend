@@ -34,5 +34,6 @@ import { AvScanService } from './av-scan.service';
     }),
     inject: [ConfigService],
   }],
+  exports: [FileService],
 })
 export class FileModule {}
