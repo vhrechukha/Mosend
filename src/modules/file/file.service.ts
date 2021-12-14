@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, Repository } from 'typeorm';
+import { FileError } from 'src/common/errors';
+import {
+  LessThan, LessThanOrEqual, MoreThanOrEqual, Repository,
+} from 'typeorm';
 
 import {
   File,
@@ -20,21 +23,41 @@ export class FileService {
     });
   }
 
-  findById(chunkId) {
-    return this.repository.findOne({
+  async findById(chunkId) {
+    const file = await this.repository.findOne({
       where: {
         id: chunkId,
+        expires_in: MoreThanOrEqual(null),
       },
     });
+
+    if (file.expires_in >= new Date() || !file.expires_in) {
+      return file;
+    }
+
+    throw new HttpException(
+      FileError.FileWithThisIdNotFound,
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
-  findByIdAndUserId(chunkId, user) {
-    return this.repository.findOne({
+  async findByIdAndUserId(chunkId, user) {
+    const file = await this.repository.findOne({
       where: {
-        id: chunkId,
         user,
+        id: chunkId,
+        expires_in: MoreThanOrEqual(new Date() || null),
       },
     });
+
+    if (file.expires_in >= new Date() || !file.expires_in) {
+      return file;
+    }
+
+    throw new HttpException(
+      FileError.FileWithThisIdNotFound,
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   deleteById(chunkId) {
@@ -51,6 +74,12 @@ export class FileService {
     return this.repository.delete({
       last_scan_date: LessThanOrEqual(time),
       scan_result: ScanResult.MALICIOUS,
+    });
+  }
+
+  deleteExpiredFiles() {
+    return this.repository.delete({
+      expires_in: LessThan(new Date()),
     });
   }
 }
