@@ -38,6 +38,7 @@
     "@sendgrid/mail": "^7.6.0",
     "@types/clamscan": "^2.0.0",
     "@types/redis": "^2.8.32",
+    "@types/stream-to-array": "^2.3.0",
     "@types/uuid": "^8.3.3",
     "aws-sdk": "^2.1041.0",
     "bcrypt": "^5.0.1",
@@ -58,6 +59,7 @@
     "redis": "^4.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
+    "stream-to-array": "^2.3.0",
     "swagger-ui-express": "^4.1.6",
     "typeorm": "^0.2.41",
     "uuid": "^8.3.2"

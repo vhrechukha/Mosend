@@ -12,19 +12,21 @@ import { InitializeDto } from './dto/Initialize.dto';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
 
-import { FileError } from '../../common/errors';
+import { FileError, UserError } from '../../common/errors';
 import { User } from '../user/entities/user.entity';
 
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FileResponse } from '../../common/responses';
 import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
+import { RedisCacheService } from '../redisCache/redisCache.service';
 
 @Controller('file')
 export class FileController {
   constructor(
     private readonly fileService: FileService,
     private readonly s3Service: S3Service,
+    private readonly redisService: RedisCacheService,
     @InjectQueue('av-scan')
     private readonly avScanQueue: Queue,
   ) {}
@@ -55,12 +57,26 @@ export class FileController {
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
 
+    const filesize = await this.fileService.getFilesize(data.body);
+
+    const bytesSize = await this.redisService.get(id);
+    const possibleBytesSize = bytesSize + filesize;
+    if (possibleBytesSize > user.f_size_max) {
+      throw new HttpException(
+        UserError.LimitExceeded,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.redisService.incrBy(id, filesize);
     await this.fileService.save({
       ...file,
+      filesize: file.filesize + filesize,
       updated_at: new Date(),
     });
 
     return this.s3Service.chunk({
+      filesize,
       UploadId: file.s3_path,
       PartNumber: data.partNumber,
       ContentLength: data.contentLength,

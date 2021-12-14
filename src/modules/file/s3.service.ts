@@ -7,7 +7,9 @@ import { Readable } from 'stream';
 export class S3Service {
   private s3: any;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+  ) {
     this.s3 = new S3({
       accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
       secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
@@ -25,24 +27,23 @@ export class S3Service {
     }).promise();
   }
 
-  chunk({
+  async chunk({
+    filesize,
     UploadId,
     PartNumber,
     Body,
     filename,
-    ContentLength,
   }: {
+    filesize: number;
     UploadId: string;
     PartNumber: number;
     Body: Readable;
     filename: string;
     ContentLength: number;
   }) {
-    const body = Readable.from(Body);
-
     return this.s3.uploadPart({
-      Body: body,
-      ContentLength,
+      Body: Readable.from(Body),
+      ContentLength: filesize,
       Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
       Key: filename,
       PartNumber,

@@ -3,13 +3,17 @@ import { Cache } from 'cache-manager';
 
 @Injectable()
 export class RedisCacheService {
-  constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {}
+  private redis: any;
+
+  constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {
+    this.redis = cache.store.getClient();
+  }
 
   async get(key) {
     return this.cache.get(key);
   }
 
-  async set(key, value) {
-    return this.cache.set(key, value);
+  async incrBy(key, value) {
+    return this.redis.incrby(key, value);
   }
 }

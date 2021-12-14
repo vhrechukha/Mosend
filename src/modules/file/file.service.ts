@@ -4,6 +4,8 @@ import { FileError } from 'src/common/errors';
 import {
   Connection, LessThan, LessThanOrEqual, Repository,
 } from 'typeorm';
+import { Readable } from 'stream';
+import toArray from 'stream-to-array';
 
 import {
   File,
@@ -93,5 +95,13 @@ export class FileService {
       .addSelect('COUNT(file.id)', 'count')
       .where('file.user_id = :id', { id })
       .getRawOne();
+  }
+
+  async getFilesize(body: Readable): Promise<number> {
+    const parts = await toArray(Readable.from(body));
+    const buffers = parts.map((part) => (Buffer.isBuffer(part) ? part : Buffer.from(part)));
+    const compressedBuffer = Buffer.concat(buffers);
+
+    return compressedBuffer.length;
   }
 }
