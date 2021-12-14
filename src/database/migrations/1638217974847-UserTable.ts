@@ -16,18 +16,6 @@ export class UserTable1638217974847 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'created_at',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'now()',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            isNullable: false,
-            default: 'now()',
-          },
-          {
             name: 'name',
             type: 'text',
             isNullable: false,
@@ -67,6 +55,16 @@ export class UserTable1638217974847 implements MigrationInterface {
             name: 'verified_at',
             type: 'timestamp',
             isNullable: true,
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+            default: 'now()',
           },
         ],
       }),

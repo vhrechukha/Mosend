@@ -19,16 +19,6 @@ export class ReportTable1639431417577 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
             name: 'file_id',
             type: 'int',
           },
@@ -47,6 +37,16 @@ export class ReportTable1639431417577 implements MigrationInterface {
             type: 'text',
             default: `'${ReportStatus.NOT_REVIEWED}'`,
             isNullable: false,
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+            default: 'now()',
           },
         ],
       }),
