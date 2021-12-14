@@ -1,7 +1,10 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface, QueryRunner, Table, TableForeignKey,
+} from 'typeorm';
+import { ReportStatus } from '../../modules/report/entitites/Report.entity';
 
-export class UserTable1638217974847 implements MigrationInterface {
-  private table = 'users';
+export class ReportTable1639431417577 implements MigrationInterface {
+  private table = 'reports';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -16,45 +19,24 @@ export class UserTable1638217974847 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'name',
+            name: 'file_id',
+            type: 'int',
+          },
+          {
+            name: 'message',
             type: 'text',
             isNullable: false,
           },
           {
-            name: 'email',
+            name: 'ip',
             type: 'text',
             isNullable: false,
           },
           {
-            name: 'password',
+            name: 'status',
             type: 'text',
+            default: `'${ReportStatus.NOT_REVIEWED}'`,
             isNullable: false,
-          },
-          {
-            name: 'suspended',
-            type: 'boolean',
-            default: false,
-            isNullable: false,
-          },
-          {
-            name: 'suspended_at',
-            type: 'timestamp',
-            isNullable: true,
-          },
-          {
-            name: 'suspension_reason',
-            type: 'text',
-            isNullable: true,
-          },
-          {
-            name: 'is_verified',
-            type: 'boolean',
-            default: false,
-          },
-          {
-            name: 'verified_at',
-            type: 'timestamp',
-            isNullable: true,
           },
           {
             name: 'created_at',
@@ -70,6 +52,13 @@ export class UserTable1638217974847 implements MigrationInterface {
       }),
       false,
     );
+
+    await queryRunner.createForeignKey(this.table, new TableForeignKey({
+      columnNames: ['file_id'],
+      referencedColumnNames: ['id'],
+      referencedTableName: 'files',
+      onDelete: 'CASCADE',
+    }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
