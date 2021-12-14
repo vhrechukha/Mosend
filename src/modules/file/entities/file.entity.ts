@@ -33,6 +33,9 @@ export class File {
   @Column()
     content_type: string;
 
+  @Column({ type: 'timestamp', nullable: true })
+    expires_in: Date;
+
   @Column({ nullable: true })
   @Exclude({ toPlainOnly: true })
     s3_path: string;

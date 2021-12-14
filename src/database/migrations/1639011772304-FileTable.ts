@@ -18,6 +18,11 @@ export class Filetable1639011772304 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
+            name: 'expires_in',
+            type: 'timestamp',
+            isNullable: true,
+          },
+          {
             name: 'max_download_count',
             isNullable: true,
             type: 'int',

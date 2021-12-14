@@ -23,5 +23,7 @@ export class CronService {
     await this.fileService.deleteFilesByLastUpdated(addDaysToCurrentDate(1));
 
     await this.fileService.deleteMaliciousFiles(addDaysToCurrentDate(7));
+
+    await this.fileService.deleteExpiredFiles();
   }
 }
