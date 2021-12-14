@@ -18,16 +18,6 @@ export class Filetable1639011772304 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'created_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
-            name: 'updated_at',
-            type: 'timestamp',
-            default: 'now()',
-          },
-          {
             name: 'max_download_count',
             isNullable: true,
             type: 'int',
@@ -94,6 +84,16 @@ export class Filetable1639011772304 implements MigrationInterface {
           {
             name: 'filename',
             type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+            default: 'now()',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+            default: 'now()',
           },
         ],
       }),
