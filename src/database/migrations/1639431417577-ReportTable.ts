@@ -1,6 +1,7 @@
 import {
   MigrationInterface, QueryRunner, Table, TableForeignKey,
 } from 'typeorm';
+import { ReportStatus } from '../../modules/report/entitites/Report.entity';
 
 export class ReportTable1639431417577 implements MigrationInterface {
   private table = 'reports';
@@ -44,7 +45,7 @@ export class ReportTable1639431417577 implements MigrationInterface {
           {
             name: 'status',
             type: 'text',
-            default: "'NOT_REVIEWED'",
+            default: `'${ReportStatus.NOT_REVIEWED}'`,
             isNullable: false,
           },
         ],
