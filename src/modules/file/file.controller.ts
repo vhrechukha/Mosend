@@ -18,6 +18,7 @@ import { User } from '../user/entities/user.entity';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FileResponse } from '../../common/responses';
+import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
 
 @Controller('file')
 export class FileController {
@@ -29,7 +30,7 @@ export class FileController {
   ) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post()
   async initialize(@CurrentUser() user: User, @Body() data: InitializeDto) {
     const { UploadId } = await this.s3Service.init(
@@ -45,7 +46,7 @@ export class FileController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/chunk')
   async chunk(
   @Param('id') id: number,
@@ -69,7 +70,7 @@ export class FileController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/finalize')
   async finalize(
   @Param('id') id: number,
