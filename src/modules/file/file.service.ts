@@ -33,7 +33,7 @@ export class FileService {
       },
     });
 
-    if (file.expires_in >= new Date() || !file.expires_in) {
+    if (file?.expires_in >= new Date() || !file?.expires_in) {
       return file;
     }
 
@@ -51,7 +51,7 @@ export class FileService {
       },
     });
 
-    if (file.expires_in >= new Date() || !file.expires_in) {
+    if (file?.expires_in >= new Date() || !file?.expires_in) {
       return file;
     }
 
