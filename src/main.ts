@@ -1,6 +1,8 @@
+import helmet from 'helmet';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/app.config.service';
 import { AllExceptionsFilter } from './common/errors/all-exceptions.filter';
@@ -8,6 +10,7 @@ import { AllExceptionsFilter } from './common/errors/all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(helmet());
   app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(new ValidationPipe());
 
