@@ -1,5 +1,6 @@
 .env.development
 .env.production
+env.docker
 aws.txt
 
 # compiled output

@@ -4,11 +4,15 @@ module.exports = {
     project: 'tsconfig.json',
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: [
+      '@typescript-eslint/eslint-plugin',
+      'security'
+  ],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'airbnb',
-    'airbnb-typescript'
+    'airbnb-typescript',
+    'plugin:security/recommended'
   ],
   root: true,
   env: {

@@ -14,10 +14,10 @@ services:
     depends_on:
       - postgres
       - redis
+      - av
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start:dev
 
   postgres:
     image: postgres:alpine
@@ -36,3 +36,19 @@ services:
       - 6379
     volumes:
       - /mnt/c/redis-data:/redis-data
+
+  av:
+    image: mkodockx/docker-clamav:alpine
+    container_name: clamav
+    restart: unless-stopped
+    ports:
+      - "3310:3310"
+    volumes:
+      - clam:/var/lib/clamav
+
+volumes:
+  clam:
+
+networks:
+  outpost_network:
+    external: true
