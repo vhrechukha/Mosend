@@ -82,7 +82,7 @@ export class FileService {
     });
   }
 
-  getInfmAboutFullnesOfLimits(id: number): Promise<{
+  getInfoAboutFullnesOfLimits(id: number): Promise<{
     size: number;
     count: number;
   }> {
