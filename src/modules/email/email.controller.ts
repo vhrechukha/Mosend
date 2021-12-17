@@ -51,7 +51,7 @@ export class EmailController {
     }
 
     return {
-      message: EmailResponse.VerifiedEmailSent,
+      message: EmailResponse[type],
     };
   }
 
@@ -69,6 +69,23 @@ export class EmailController {
 
     return {
       message: EmailResponse.DeletionEmailSent,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get('/sendEmailForChange')
+  async sendEmailForChange(@CurrentUser() user: User) {
+    const link = this.authService.signUrl(
+      `${this.configService.get('BACKEND_HOST')}/auth/changeEmail?id=${user.id}`,
+      180000,
+    );
+
+    const options = Emails.ChangingEmailOfAccount(user.email, link);
+    await this.emailService.send(options);
+
+    return {
+      message: EmailResponse.ChangeEmail,
     };
   }
 }
