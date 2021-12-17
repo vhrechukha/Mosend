@@ -38,17 +38,20 @@ export class S3Service {
   }
 
   async chunk({
+    files,
     UploadId,
     PartNumber,
     Body,
     file,
     user,
   }: {
+    files: any,
     user: {
       f_size_max: number;
       id: number;
     };
     file: {
+      id: number;
       filename: string,
       extension: string,
     },
@@ -65,9 +68,16 @@ export class S3Service {
     }> {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
+      const anotherFiles = files.filter((e) => e !== file.id);
+      const bytesInAnotherFiles = await anotherFiles.reduce(async (acc, e) => {
+        const filebytes = await this.redisService.get(e.id);
+
+        return (await acc) + filebytes;
+      }, 0);
+
       const read = Readable.from(Body, { highWaterMark: 5000 });
 
-      const bytesSize = await this.redisService.get(user.id);
+      const bytesSize = await this.redisService.get(file.id);
 
       const filenameLocal = path.join(this.tmpDir, `${new Date().getTime()}-${Math.random() * 10}.${file.extension}`);
 
@@ -77,7 +87,7 @@ export class S3Service {
       read.on('data', async (chunk) => {
         filesize += chunk.length;
 
-        const possibleBytesSize = bytesSize + filesize;
+        const possibleBytesSize = bytesSize + filesize + bytesInAnotherFiles;
         if (possibleBytesSize > user.f_size_max) {
           rej(new HttpException(
             UserError.LimitExceeded,
@@ -85,7 +95,7 @@ export class S3Service {
           ));
         }
 
-        await this.redisService.incrBy(user.id, filesize);
+        await this.redisService.incrBy(file.id, filesize);
       });
 
       read.pipe(write);

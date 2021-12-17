@@ -56,13 +56,16 @@ export class FileController {
     @Body() data: ChunkDto,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
+    const files = await this.fileService.findManyByUserId(user.id);
 
     const result = await this.s3Service.chunk({
+      files,
       user: {
         f_size_max: user.f_size_max,
         id: user.id,
       },
       file: {
+        id: file.id,
         filename: file.filename,
         extension: file.extension,
       },
@@ -74,7 +77,6 @@ export class FileController {
 
     await this.fileService.save({
       ...file,
-      filesize: file.filesize + result.filesize,
       updated_at: new Date(),
     });
 
@@ -96,8 +98,11 @@ export class FileController {
       filename: file.filename,
     });
 
+    const filesize = await this.redisService.get(file.id);
+
     await this.fileService.save({
       ...file,
+      filesize,
       s3_status: 'finished',
     });
 

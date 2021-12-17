@@ -24,6 +24,15 @@ export class FileService {
     });
   }
 
+  findManyByUserId(userId) {
+    return this.repository.find({
+      select: ['id'],
+      where: {
+        user: userId,
+      },
+    });
+  }
+
   async findById(chunkId) {
     const file = await this.repository.findOne({
       where: {
