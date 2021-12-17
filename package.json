@@ -42,6 +42,7 @@
     "@types/uuid": "^8.3.3",
     "aws-sdk": "^2.1041.0",
     "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.1",
     "bull": "^3.29.3",
     "cache-manager": "^3.6.0",
     "cache-manager-redis-store": "^2.0.0",

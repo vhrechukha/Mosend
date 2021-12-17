@@ -12,7 +12,7 @@ import { InitializeDto } from './dto/Initialize.dto';
 import { FinalizeDto } from './dto/Finalize.dto';
 import { ChunkDto } from './dto/Chunk.dto';
 
-import { FileError, UserError } from '../../common/errors';
+import { FileError } from '../../common/errors';
 import { User } from '../user/entities/user.entity';
 
 import { CurrentUser } from '../../common/decorators/user.decorator';
@@ -57,32 +57,28 @@ export class FileController {
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
 
-    const filesize = await this.fileService.getFilesize(data.body);
-
-    const bytesSize = await this.redisService.get(id);
-    const possibleBytesSize = bytesSize + filesize;
-    if (possibleBytesSize > user.f_size_max) {
-      throw new HttpException(
-        UserError.LimitExceeded,
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    await this.redisService.incrBy(id, filesize);
-    await this.fileService.save({
-      ...file,
-      filesize: file.filesize + filesize,
-      updated_at: new Date(),
-    });
-
-    return this.s3Service.chunk({
-      filesize,
+    const result = await this.s3Service.chunk({
+      user: {
+        f_size_max: user.f_size_max,
+        id: user.id,
+      },
+      file: {
+        filename: file.filename,
+        extension: file.extension,
+      },
       UploadId: file.s3_path,
       PartNumber: data.partNumber,
       ContentLength: data.contentLength,
       Body: data.body,
-      filename: file.filename,
     });
+
+    await this.fileService.save({
+      ...file,
+      filesize: file.filesize + result.filesize,
+      updated_at: new Date(),
+    });
+
+    return result;
   }
 
   @ApiBearerAuth()
