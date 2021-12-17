@@ -18,18 +18,21 @@ import { User } from '../user/entities/user.entity';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FileResponse } from '../../common/responses';
+import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
+import { RedisCacheService } from '../redisCache/redisCache.service';
 
 @Controller('file')
 export class FileController {
   constructor(
     private readonly fileService: FileService,
     private readonly s3Service: S3Service,
+    private readonly redisService: RedisCacheService,
     @InjectQueue('av-scan')
     private readonly avScanQueue: Queue,
   ) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post()
   async initialize(@CurrentUser() user: User, @Body() data: InitializeDto) {
     const { UploadId } = await this.s3Service.init(
@@ -45,7 +48,7 @@ export class FileController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/chunk')
   async chunk(
   @Param('id') id: number,
@@ -53,23 +56,35 @@ export class FileController {
     @Body() data: ChunkDto,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
+    const files = await this.fileService.findManyByUserId(user.id);
+
+    const result = await this.s3Service.chunk({
+      files,
+      user: {
+        f_size_max: user.f_size_max,
+        id: user.id,
+      },
+      file: {
+        id: file.id,
+        filename: file.filename,
+        extension: file.extension,
+      },
+      UploadId: file.s3_path,
+      PartNumber: data.partNumber,
+      ContentLength: data.contentLength,
+      Body: data.body,
+    });
 
     await this.fileService.save({
       ...file,
       updated_at: new Date(),
     });
 
-    return this.s3Service.chunk({
-      UploadId: file.s3_path,
-      PartNumber: data.partNumber,
-      ContentLength: data.contentLength,
-      Body: data.body,
-      filename: file.filename,
-    });
+    return result;
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
+  @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/finalize')
   async finalize(
   @Param('id') id: number,
@@ -83,8 +98,11 @@ export class FileController {
       filename: file.filename,
     });
 
+    const filesize = await this.redisService.get(file.id);
+
     await this.fileService.save({
       ...file,
+      filesize,
       s3_status: 'finished',
     });
 

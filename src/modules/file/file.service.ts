@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileError } from 'src/common/errors';
 import {
-  LessThan, LessThanOrEqual, MoreThanOrEqual, Repository,
+  Connection, LessThan, LessThanOrEqual, Repository,
 } from 'typeorm';
 
 import {
@@ -15,6 +15,7 @@ export class FileService {
   constructor(
     @InjectRepository(File)
     private repository: Repository<File>,
+    private connection: Connection,
   ) {}
 
   async save(data) {
@@ -23,15 +24,23 @@ export class FileService {
     });
   }
 
+  findManyByUserId(userId) {
+    return this.repository.find({
+      select: ['id'],
+      where: {
+        user: userId,
+      },
+    });
+  }
+
   async findById(chunkId) {
     const file = await this.repository.findOne({
       where: {
         id: chunkId,
-        expires_in: MoreThanOrEqual(null),
       },
     });
 
-    if (file.expires_in >= new Date() || !file.expires_in) {
+    if (file?.expires_in >= new Date() || !file?.expires_in) {
       return file;
     }
 
@@ -46,11 +55,10 @@ export class FileService {
       where: {
         user,
         id: chunkId,
-        expires_in: MoreThanOrEqual(new Date() || null),
       },
     });
 
-    if (file.expires_in >= new Date() || !file.expires_in) {
+    if (file?.expires_in >= new Date() || !file?.expires_in) {
       return file;
     }
 
@@ -81,5 +89,18 @@ export class FileService {
     return this.repository.delete({
       expires_in: LessThan(new Date()),
     });
+  }
+
+  getInfoAboutFullnesOfLimits(id: number): Promise<{
+    size: number;
+    count: number;
+  }> {
+    return this.connection
+      .getRepository(File)
+      .createQueryBuilder('file')
+      .select('SUM(file.filesize)', 'size')
+      .addSelect('COUNT(file.id)', 'count')
+      .where('file.user_id = :id', { id })
+      .getRawOne();
   }
 }
