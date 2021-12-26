@@ -8,9 +8,9 @@ import { EmailService } from './email.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 
-import { Emails, EmailsForResetting, pathOfEmailsForResetting } from './email.templates';
+import { Emails, EmailResettingResponseTypes, pathOfEmailsForResetting } from './email.templates';
 import { EmailError } from '../../common/errors';
-import { EmailResponse } from '../../common/responses';
+import { EmailResponsesTypes } from '../../common/responses';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
@@ -26,7 +26,7 @@ export class EmailController {
 
   @Get('/resendEmail')
   async resendEmail(
-    @Query('type') type: EmailsForResetting,
+    @Query('type') type: EmailResettingResponseTypes,
     @Query('email') email: string,
   ) {
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -51,7 +51,7 @@ export class EmailController {
     }
 
     return {
-      message: EmailResponse[type],
+      mCode: EmailResponsesTypes[type],
     };
   }
 
@@ -64,11 +64,11 @@ export class EmailController {
       180000,
     );
 
-    const options = Emails.DeletionOfAccount(user.email, link);
+    const options = Emails.DELETE_ACCOUNT_EMAIL_SENT(user.email, link);
     await this.emailService.send(options);
 
     return {
-      message: EmailResponse.DeletionEmailSent,
+      mCode: EmailResponsesTypes.DELETION_EMAIL_SENT,
     };
   }
 
@@ -85,7 +85,7 @@ export class EmailController {
     await this.emailService.send(options);
 
     return {
-      message: EmailResponse.ChangeEmail,
+      message: EmailResponsesTypes.VERIFIED_EMAIL_SENT,
     };
   }
 }
