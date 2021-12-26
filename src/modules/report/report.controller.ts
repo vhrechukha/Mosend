@@ -5,7 +5,7 @@ import { Request } from 'express';
 
 import { ReportDto } from './dto/Report.dto';
 
-import { FileResponse } from '../../common/responses';
+import { FileResponsesTypes } from '../../common/responses';
 import { ReportService } from './report.service';
 
 @Controller('report')
@@ -27,7 +27,7 @@ export class ReportController {
     });
 
     return {
-      message: FileResponse.ScheduledForCheck,
+      mCode: FileResponsesTypes.SCHEDULED_FOR_CHECK,
     };
   }
 }

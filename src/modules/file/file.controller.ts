@@ -17,7 +17,7 @@ import { User } from '../user/entities/user.entity';
 
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
-import { FileResponse } from '../../common/responses';
+import { FileResponsesTypes } from '../../common/responses';
 import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
 import { RedisCacheService } from '../redisCache/redisCache.service';
 
@@ -159,7 +159,7 @@ export class FileController {
     });
 
     return {
-      message: FileResponse.ScheduledForCheck,
+      mCode: FileResponsesTypes.SCHEDULED_FOR_CHECK,
     };
   }
 }

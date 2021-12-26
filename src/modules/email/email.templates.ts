@@ -1,5 +1,5 @@
 const Emails = {
-  VerificationOfAccount: (to, link) => ({
+  VERIFIED_EMAIL_SENT: (to, link) => ({
     to,
     subject: 'MOSEND: Email verification =?UTF-8?B?8J+WpA==?=',
     html: `
@@ -7,7 +7,7 @@ const Emails = {
     for email verfication on our site, <br> have a nice day ☀
   `,
   }),
-  DeletionOfAccount: (to, link) => ({
+  DELETE_ACCOUNT_EMAIL_SENT: (to, link) => ({
     to,
     subject: 'MOSEND: Deletion of account =?UTF-8?B?8J+YrQ==?=',
     html: `
@@ -16,7 +16,7 @@ const Emails = {
     <br> have a good life without us ☀
   `,
   }),
-  ResetPasswordOfAccount: (to, link) => ({
+  RESET_PASSWORD_EMAIL_SENT: (to, link) => ({
     to,
     subject: 'MOSEND: Reset password =?UTF-8?B?8J+WpA==?=',
     html: `
@@ -26,14 +26,14 @@ const Emails = {
   }),
 };
 
-type EmailsForResetting = 'VerificationOfAccount' | 'ResetPasswordOfAccount';
+type EmailResettingResponseTypes = 'VERIFIED_EMAIL_SENT' | 'RESET_PASSWORD_EMAIL_SENT';
 const pathOfEmailsForResetting = {
-  VerificationOfAccount: 'verifyEmail',
-  ResetPasswordOfAccount: 'resetPassword',
+  VERIFIED_EMAIL_SENT: 'VERIFIED_EMAIL_SENT',
+  RESET_PASSWORD_EMAIL_SENT: 'RESET_PASSWORD_EMAIL_SENT',
 };
 
 export {
   Emails,
-  EmailsForResetting,
+  EmailResettingResponseTypes,
   pathOfEmailsForResetting,
 };
