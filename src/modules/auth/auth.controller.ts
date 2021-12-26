@@ -142,7 +142,8 @@ export class AuthController {
   @Get('/verifyEmail')
   async verifyEmail(
     @Req() req: Request,
-    @Res() res: Response, @Query('id') id: number,
+    @Res() res: Response,
+    @Query('id') id: number,
   ) {
     this.authService.verifySignedUrl(`${this.backend_host}${req.originalUrl}`);
 
@@ -227,7 +228,7 @@ export class AuthController {
     });
 
     return {
-      mCode: AuthResponsesTypes.EMAIL_VERIFIED,
+      mCode: AuthResponsesTypes.EMAIL_CHANGED,
     };
   }
 }

@@ -85,7 +85,7 @@ export class EmailController {
     await this.emailService.send(options);
 
     return {
-      message: EmailResponsesTypes.VERIFIED_EMAIL_SENT,
+      mCode: EmailResponsesTypes.CHANGE_EMAIL,
     };
   }
 }
