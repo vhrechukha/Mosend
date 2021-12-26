@@ -81,7 +81,7 @@ export class EmailController {
       180000,
     );
 
-    const options = Emails.ChangingEmailOfAccount(user.email, link);
+    const options = Emails.CHANGE_EMAIL_LINK_SENT(user.email, link);
     await this.emailService.send(options);
 
     return {

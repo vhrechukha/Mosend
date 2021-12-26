@@ -24,7 +24,7 @@ const Emails = {
     for password resseting on our site, <br> have a good day ☀
   `,
   }),
-  ChangingEmailOfAccount: (to, link) => ({
+  CHANGE_EMAIL_LINK_SENT: (to, link) => ({
     to,
     subject: 'MOSEND: Change email =?UTF-8?B?8J+WpA==?=',
     html: `
