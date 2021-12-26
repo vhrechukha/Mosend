@@ -95,7 +95,10 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/updatePassword')
-  async updatePassword(@CurrentUser() user: User, @Body() data: UpdatePasswordDto) {
+  async updatePassword(
+    @CurrentUser() user: User,
+    @Body() data: UpdatePasswordDto,
+  ) {
     const userDb = await this.userService.findOneById(user.id);
 
     if (!userDb) {
@@ -128,7 +131,10 @@ export class AuthController {
   }
 
   @Get('/verifyEmail')
-  async verifyEmail(@Req() req: Request, @Query('id') id: number) {
+  async verifyEmail(
+    @Req() req: Request,
+    @Query('id') id: number,
+  ) {
     this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
 
     const user = await this.userService.findOneById(id);
@@ -147,7 +153,10 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get('/verifyDeletion')
-  async verifyDeletion(@Req() req: Request, @Query('id') id: number) {
+  async verifyDeletion(
+    @Req() req: Request,
+    @Query('id') id: number,
+  ) {
     this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
 
     await this.userService.deleteById(id);
@@ -160,7 +169,11 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Post('/resetPassword')
-  async resetPassword(@Req() req: Request, @Query('id') id: number, @Body('password') password: string) {
+  async resetPassword(
+    @Req() req: Request,
+    @Query('id') id: number,
+    @Body('password') password: string,
+  ) {
     this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
 
     const userDb = await this.userService.findOneById(id);
@@ -179,6 +192,35 @@ export class AuthController {
 
     return {
       message: AuthResponse.PasswordReset,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Post('/changeEmail')
+  async changeEmail(
+    @Req() req: Request,
+    @Query('id') id: number,
+    @Body('email') email: string,
+  ) {
+    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+
+    const userDb = await this.userService.findOneById(id);
+
+    if (!userDb) {
+      throw new HttpException(
+        UserError.UserWithEmailNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.userService.save({
+      ...userDb,
+      email,
+    });
+
+    return {
+      message: AuthResponse.EmailChanged,
     };
   }
 }

@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import * as bodyParser from 'body-parser';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,14 +7,18 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/app.config.service';
 import { AllExceptionsFilter } from './common/errors/all-exceptions.filter';
+import { TypeoremFilter } from './common/errors/typeorem.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(helmet());
   app.use(bodyParser.json({ limit: '5000b' }));
   app.use(bodyParser.urlencoded({ limit: '5000mb', extended: true }));
 
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new TypeoremFilter());
+
   app.useGlobalPipes(new ValidationPipe());
 
   app.useGlobalInterceptors(
