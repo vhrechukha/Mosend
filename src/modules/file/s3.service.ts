@@ -1,13 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { S3 } from 'aws-sdk';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Readable } from 'stream';
+import { S3 } from 'aws-sdk';
+import path from 'path';
+import * as os from 'os';
+import fs from 'fs';
+
+import { UserError } from '../../common/errors';
+import { RedisCacheService } from '../redisCache/redisCache.service';
 
 @Injectable()
 export class S3Service {
   private s3: any;
 
-  constructor(private readonly configService: ConfigService) {
+  private tmpDir: string;
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly redisService: RedisCacheService,
+  ) {
+    this.tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mosend'));
     this.s3 = new S3({
       accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
       secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
@@ -25,29 +37,85 @@ export class S3Service {
     }).promise();
   }
 
-  chunk({
+  async chunk({
+    files,
     UploadId,
     PartNumber,
     Body,
-    filename,
-    ContentLength,
+    file,
+    user,
   }: {
+    files: any,
+    user: {
+      f_size_max: number;
+      id: number;
+    };
+    file: {
+      id: number;
+      filename: string,
+      extension: string,
+    },
     UploadId: string;
     PartNumber: number;
     Body: Readable;
-    filename: string;
     ContentLength: number;
-  }) {
-    const body = Readable.from(Body);
+  }): Promise<{
+      data: {
+        ServerSideEncryption: string;
+        ETag: string;
+      };
+      filesize: number;
+    }> {
+    return new Promise(async (res, rej) => {
+      const anotherFiles = files.filter((e) => e !== file.id);
+      const bytesInAnotherFiles = await anotherFiles.reduce(async (acc, e) => {
+        const filebytes = await this.redisService.get(e.id);
 
-    return this.s3.uploadPart({
-      Body: body,
-      ContentLength,
-      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-      Key: filename,
-      PartNumber,
-      UploadId,
-    }).promise();
+        return (await acc) + filebytes;
+      }, 0);
+
+      const read = Readable.from(Body, { highWaterMark: 5000 });
+
+      const bytesSize = await this.redisService.get(file.id);
+
+      const filenameLocal = path.join(this.tmpDir, `${new Date().getTime()}-${Math.random() * 10}.${file.extension}`);
+
+      const write = fs.createWriteStream(filenameLocal);
+
+      let filesize = 0;
+      read.on('data', async (chunk) => {
+        filesize += chunk.length;
+
+        const possibleBytesSize = bytesSize + filesize + bytesInAnotherFiles;
+        if (possibleBytesSize > user.f_size_max) {
+          rej(new HttpException(
+            UserError.LimitExceeded,
+            HttpStatus.FORBIDDEN,
+          ));
+        }
+
+        await this.redisService.incrBy(file.id, filesize);
+      });
+
+      read.pipe(write);
+
+      const data = await this.s3.uploadPart({
+        Body: read,
+        ContentLength: filesize,
+        Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+        Key: file.filename,
+        PartNumber,
+        UploadId,
+      })
+        .promise();
+
+      await fs.unlinkSync(filenameLocal);
+
+      res({
+        data,
+        filesize,
+      });
+    });
   }
 
   async finalize({

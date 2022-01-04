@@ -15,6 +15,12 @@ export class User {
   @Column('text')
     email: string;
 
+  @Column('int', { default: 24000 })
+    f_size_max: number;
+
+  @Column('int', { default: 5 })
+    f_count_max: number;
+
   @Column('text')
   @Exclude({ toPlainOnly: true })
     password: string;

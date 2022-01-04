@@ -9,6 +9,7 @@ enum UserError {
   PasswordOrEmailIsIncorrect = 'Password or email is incorrect.',
   UserWithEmailNotFound = 'User with this email was not found.',
   UserIsAlreadyExists = 'User is already exists.',
+  LimitExceeded = 'You exceeded all limits.',
 }
 
 enum FileError {

@@ -5,11 +5,11 @@ import {
   Post,
   UseGuards,
   HttpException,
-  HttpStatus, Get, Query, Req,
+  HttpStatus, Get, Query, Req, Res,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
@@ -21,7 +21,7 @@ import { User } from '../user/entities/user.entity';
 import { EmailError, UserError } from '../../common/errors';
 import { EmailService } from '../email/email.service';
 import { Emails } from '../email/email.templates';
-import { AuthResponse } from '../../common/responses';
+import { AuthResponsesTypes, EmailResponsesTypes } from '../../common/responses';
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -29,6 +29,10 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('auth')
 export class AuthController {
+  private backendHost = this.configService.get('BACKEND_HOST');
+
+  private frontendHost = this.configService.get('FRONTEND_HOST');
+
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
@@ -59,7 +63,12 @@ export class AuthController {
       hashPassword: user.password,
     });
 
-    return this.authService.signToken(user, 360000);
+    const { token } = await this.authService.signToken(user, 360000);
+
+    return {
+      token,
+      user,
+    };
   }
 
   @Post('/register')
@@ -80,15 +89,15 @@ export class AuthController {
     });
 
     const link = this.authService.signUrl(
-      `${this.configService.get('BACKEND_HOST')}/auth/verifyEmail?id=${user.id}`,
+      `${this.backendHost}/auth/verifyEmail?id=${user.id}`,
       180000,
     );
 
-    const options = Emails.VerificationOfAccount(data.email, link);
+    const options = Emails.VERIFIED_EMAIL_SENT(data.email, link);
     await this.emailService.send(options);
 
     return {
-      message: AuthResponse.SignedUp,
+      mCode: EmailResponsesTypes.VERIFIED_EMAIL_SENT,
     };
   }
 
@@ -119,7 +128,7 @@ export class AuthController {
     });
 
     return {
-      message: AuthResponse.PasswordUpdated,
+      mCode: AuthResponsesTypes.PASSWORD_UPDATED,
     };
   }
 
@@ -133,9 +142,10 @@ export class AuthController {
   @Get('/verifyEmail')
   async verifyEmail(
     @Req() req: Request,
+    @Res() res: Response,
     @Query('id') id: number,
   ) {
-    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     const user = await this.userService.findOneById(id);
 
@@ -145,9 +155,7 @@ export class AuthController {
       verified_at: new Date(),
     });
 
-    return {
-      message: AuthResponse.Verified,
-    };
+    return res.redirect(`${this.frontendHost}/signin?mCode=${EmailResponsesTypes.VERIFIED_EMAIL_SENT}`);
   }
 
   @ApiBearerAuth()
@@ -157,12 +165,12 @@ export class AuthController {
     @Req() req: Request,
     @Query('id') id: number,
   ) {
-    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     await this.userService.deleteById(id);
 
     return {
-      message: AuthResponse.Deleted,
+      mCode: AuthResponsesTypes.DELETED,
     };
   }
 
@@ -174,7 +182,7 @@ export class AuthController {
     @Query('id') id: number,
     @Body('password') password: string,
   ) {
-    this.authService.verifySignedUrl(`${this.configService.get('BACKEND_HOST')}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     const userDb = await this.userService.findOneById(id);
 
@@ -191,7 +199,7 @@ export class AuthController {
     });
 
     return {
-      message: AuthResponse.PasswordReset,
+      mCode: AuthResponsesTypes.PASSWORD_RESET,
     };
   }
 
@@ -220,7 +228,7 @@ export class AuthController {
     });
 
     return {
-      message: AuthResponse.EmailChanged,
+      mCode: AuthResponsesTypes.EMAIL_CHANGED,
     };
   }
 }

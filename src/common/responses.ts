@@ -1,21 +1,23 @@
-enum AuthResponse {
-  Verified = 'You were successfully verified. Yet, you can login with your email and password.',
-  SignedUp = 'You signed up successfully. Please, verify your email at first.',
-  Deleted = 'User was successfully deleted.',
-  PasswordUpdated = 'Password updated successfully.',
-  PasswordReset = 'Password reset successfully.',
-  EmailChanged = 'Email successfully changed.',
+enum AuthResponsesTypes {
+  EMAIL_VERIFIED = 'EMAIL_VERIFIED',
+  SIGNED_UP = 'SIGNED_UP',
+  DELETED = 'DELETED',
+  PASSWORD_UPDATED = 'PASSWORD_UPDATED',
+  PASSWORD_RESET = 'PASSWORD_RESET',
+  EMAIL_CHANGED = 'EMAIL_CHANGED',
 }
 
-enum EmailResponse {
-  ChangeEmail = 'Link for email changing sent. Check your mail.',
-  VerificationOfAccount = 'You were successfully verified. Yet, you can login with your email and password.',
-  ResetPasswordOfAccount = 'Email with resetting link sent for password. Check your mail.',
-  DeletionEmailSent = 'Email with deletion link sent. Check your mail.',
+enum EmailResponsesTypes {
+  CHANGE_EMAIL = 'CHANGE_EMAIL',
+  RESET_PASSWORD_EMAIL_SENT = 'RESET_PASSWORD_EMAIL_SENT',
+  VERIFIED_EMAIL_SENT = 'VERIFIED_EMAIL_SENT',
+  DELETION_EMAIL_SENT = 'DELETION_EMAIL_SENT',
 }
 
-enum FileResponse {
-  ScheduledForCheck = 'File was successfully scheduled for check.',
+enum FileResponsesTypes {
+  SCHEDULED_FOR_CHECK = 'SCHEDULED_FOR_CHECK',
 }
 
-export { AuthResponse, EmailResponse, FileResponse };
+export {
+  AuthResponsesTypes, EmailResponsesTypes, FileResponsesTypes,
+};

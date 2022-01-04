@@ -57,6 +57,16 @@ export class UserTable1638217974847 implements MigrationInterface {
             isNullable: true,
           },
           {
+            name: 'f_count_max',
+            default: 5,
+            type: 'int',
+          },
+          {
+            name: 'f_size_max',
+            default: 24000,
+            type: 'int',
+          },
+          {
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',

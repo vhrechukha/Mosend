@@ -35,5 +35,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/indent': 'off',
+    'no-async-promise-executor': 'off'
   },
 };

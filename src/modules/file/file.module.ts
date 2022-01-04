@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
+import { RedisCacheModule } from '../redisCache/redisCache.module';
 
 import { FileService } from './file.service';
 import { File } from './entities/file.entity';
@@ -17,6 +18,7 @@ import { AvScanProcessor } from './av-scan.processor';
     ConfigModule,
     UserModule,
     AuthModule,
+    RedisCacheModule,
     TypeOrmModule.forFeature([File]),
     BullModule.registerQueueAsync({
       name: 'av-scan',
