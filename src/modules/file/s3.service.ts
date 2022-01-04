@@ -66,7 +66,6 @@ export class S3Service {
       };
       filesize: number;
     }> {
-    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       const anotherFiles = files.filter((e) => e !== file.id);
       const bytesInAnotherFiles = await anotherFiles.reduce(async (acc, e) => {

@@ -1,9 +1,10 @@
 import { Injectable, Inject, CACHE_MANAGER } from '@nestjs/common';
 import { Cache } from 'cache-manager';
+import { RedisClient } from 'node_modules/@nestjs/microservices/external/redis.interface';
 
 @Injectable()
 export class RedisCacheService {
-  private redis: any;
+  private readonly redis: RedisClient;
 
   constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {
     this.redis = cache.store.getClient();

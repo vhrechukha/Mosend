@@ -29,10 +29,10 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('auth')
 export class AuthController {
-  backend_host = this.configService.get('BACKEND_HOST');
-  
-  frontend_host = this.configService.get('FRONTEND_HOST');
-  
+  private backend_host = this.configService.get('BACKEND_HOST');
+
+  private frontend_host = this.configService.get('FRONTEND_HOST');
+
   constructor(
     private configService: ConfigService,
     private authService: AuthService,
