@@ -29,9 +29,9 @@ import { UpdatePasswordDto } from './dto/updatePassword.dto';
 
 @Controller('auth')
 export class AuthController {
-  private backend_host = this.configService.get('BACKEND_HOST');
+  private backendHost = this.configService.get('BACKEND_HOST');
 
-  private frontend_host = this.configService.get('FRONTEND_HOST');
+  private frontendHost = this.configService.get('FRONTEND_HOST');
 
   constructor(
     private configService: ConfigService,
@@ -89,7 +89,7 @@ export class AuthController {
     });
 
     const link = this.authService.signUrl(
-      `${this.backend_host}/auth/verifyEmail?id=${user.id}`,
+      `${this.backendHost}/auth/verifyEmail?id=${user.id}`,
       180000,
     );
 
@@ -145,7 +145,7 @@ export class AuthController {
     @Res() res: Response,
     @Query('id') id: number,
   ) {
-    this.authService.verifySignedUrl(`${this.backend_host}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     const user = await this.userService.findOneById(id);
 
@@ -155,7 +155,7 @@ export class AuthController {
       verified_at: new Date(),
     });
 
-    return res.redirect(`${this.frontend_host}/signin?mCode=${EmailResponsesTypes.VERIFIED_EMAIL_SENT}`);
+    return res.redirect(`${this.frontendHost}/signin?mCode=${EmailResponsesTypes.VERIFIED_EMAIL_SENT}`);
   }
 
   @ApiBearerAuth()
@@ -165,7 +165,7 @@ export class AuthController {
     @Req() req: Request,
     @Query('id') id: number,
   ) {
-    this.authService.verifySignedUrl(`${this.backend_host}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     await this.userService.deleteById(id);
 
@@ -182,7 +182,7 @@ export class AuthController {
     @Query('id') id: number,
     @Body('password') password: string,
   ) {
-    this.authService.verifySignedUrl(`${this.backend_host}${req.originalUrl}`);
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
 
     const userDb = await this.userService.findOneById(id);
 
