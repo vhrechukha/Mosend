@@ -17,6 +17,8 @@ import { User } from '../user/entities/user.entity';
 
 @Controller('email')
 export class EmailController {
+  private backendHost = this.configService.get('BACKEND_HOST');
+
   constructor(
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
@@ -42,7 +44,7 @@ export class EmailController {
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       const link = this.authService.signUrl(
-        `${this.configService.get('BACKEND_HOST')}/auth/${pathOfEmailsForResetting[type]}?id=${user.id}`,
+        `${this.backendHost}/auth/${pathOfEmailsForResetting[type]}?id=${user.id}`,
         180000,
       );
 
@@ -60,7 +62,7 @@ export class EmailController {
   @Get('/sendDeletionEmail')
   async sendDeletionEmail(@CurrentUser() user: User) {
     const link = this.authService.signUrl(
-      `${this.configService.get('BACKEND_HOST')}/auth/verifyDeletion?id=${user.id}`,
+      `${this.backendHost}/auth/verifyDeletion?id=${user.id}`,
       180000,
     );
 
@@ -77,7 +79,7 @@ export class EmailController {
   @Get('/sendEmailForChange')
   async sendEmailForChange(@CurrentUser() user: User) {
     const link = this.authService.signUrl(
-      `${this.configService.get('BACKEND_HOST')}/auth/changeEmail?id=${user.id}`,
+      `${this.backendHost}/auth/changeEmail?id=${user.id}`,
       180000,
     );
 
