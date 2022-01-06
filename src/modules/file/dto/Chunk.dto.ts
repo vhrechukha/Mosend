@@ -14,7 +14,7 @@ export class ChunkDto {
     default: 'some text',
   })
   @IsNotEmpty()
-    body: string;
+    body: Buffer;
 
   @ApiProperty({
     required: true,

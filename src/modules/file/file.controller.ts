@@ -70,7 +70,7 @@ export class FileController {
       UploadId: file.s3_path,
       PartNumber: data.partNumber,
       ContentLength: data.contentLength,
-      Body: Buffer.from(data.body),
+      Body: data.body,
     });
 
     await this.fileService.save({
