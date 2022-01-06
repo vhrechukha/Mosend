@@ -8,15 +8,17 @@ import { EmailService } from './email.service';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
 
-import { Emails, EmailsForResetting, pathOfEmailsForResetting } from './email.templates';
+import { Emails, EmailResettingResponseTypes, pathOfEmailsForResetting } from './email.templates';
 import { EmailError } from '../../common/errors';
-import { EmailResponse } from '../../common/responses';
+import { EmailResponsesTypes } from '../../common/responses';
 import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { User } from '../user/entities/user.entity';
 
 @Controller('email')
 export class EmailController {
+  private backendHost = this.configService.get('BACKEND_HOST');
+
   constructor(
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
@@ -26,7 +28,7 @@ export class EmailController {
 
   @Get('/resendEmail')
   async resendEmail(
-    @Query('type') type: EmailsForResetting,
+    @Query('type') type: EmailResettingResponseTypes,
     @Query('email') email: string,
   ) {
     const emailRegex = /^\S+@\S+\.\S+$/;
@@ -42,7 +44,7 @@ export class EmailController {
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       const link = this.authService.signUrl(
-        `${this.configService.get('BACKEND_HOST')}/auth/${pathOfEmailsForResetting[type]}?id=${user.id}`,
+        `${this.backendHost}/auth/${pathOfEmailsForResetting[type]}?id=${user.id}`,
         180000,
       );
 
@@ -51,7 +53,7 @@ export class EmailController {
     }
 
     return {
-      message: EmailResponse.VerifiedEmailSent,
+      mCode: EmailResponsesTypes[type],
     };
   }
 
@@ -60,15 +62,32 @@ export class EmailController {
   @Get('/sendDeletionEmail')
   async sendDeletionEmail(@CurrentUser() user: User) {
     const link = this.authService.signUrl(
-      `${this.configService.get('BACKEND_HOST')}/auth/verifyDeletion?id=${user.id}`,
+      `${this.backendHost}/auth/verifyDeletion?id=${user.id}`,
       180000,
     );
 
-    const options = Emails.DeletionOfAccount(user.email, link);
+    const options = Emails.DELETE_ACCOUNT_EMAIL_SENT(user.email, link);
     await this.emailService.send(options);
 
     return {
-      message: EmailResponse.DeletionEmailSent,
+      mCode: EmailResponsesTypes.DELETION_EMAIL_SENT,
+    };
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get('/sendEmailForChange')
+  async sendEmailForChange(@CurrentUser() user: User) {
+    const link = this.authService.signUrl(
+      `${this.backendHost}/auth/changeEmail?id=${user.id}`,
+      180000,
+    );
+
+    const options = Emails.CHANGE_EMAIL_LINK_SENT(user.email, link);
+    await this.emailService.send(options);
+
+    return {
+      mCode: EmailResponsesTypes.CHANGE_EMAIL,
     };
   }
 }
