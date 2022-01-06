@@ -4,11 +4,15 @@ module.exports = {
     project: 'tsconfig.json',
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: [
+      '@typescript-eslint/eslint-plugin',
+      'security'
+  ],
   extends: [
     'plugin:@typescript-eslint/recommended',
     'airbnb',
-    'airbnb-typescript'
+    'airbnb-typescript',
+    'plugin:security/recommended'
   ],
   root: true,
   env: {
@@ -29,6 +33,8 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/indent': 'off',
+    'no-async-promise-executor': 'off'
   },
 };
