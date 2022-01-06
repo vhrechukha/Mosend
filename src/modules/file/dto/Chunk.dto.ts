@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { Readable } from 'stream';
 
 export class ChunkDto {
   @ApiProperty({
@@ -15,7 +14,7 @@ export class ChunkDto {
     default: 'some text',
   })
   @IsNotEmpty()
-    body: Readable;
+    body: Buffer;
 
   @ApiProperty({
     required: true,

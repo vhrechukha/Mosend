@@ -56,10 +56,8 @@ export class FileController {
     @Body() data: ChunkDto,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
-    const files = await this.fileService.findManyByUserId(user.id);
 
     const result = await this.s3Service.chunk({
-      files,
       user: {
         f_size_max: user.f_size_max,
         id: user.id,

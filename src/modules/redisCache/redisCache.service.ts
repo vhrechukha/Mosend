@@ -10,11 +10,11 @@ export class RedisCacheService {
     this.redis = cache.store.getClient();
   }
 
-  async get(key) {
+  async get<T>(key): Promise<T> {
     return this.cache.get(key);
   }
 
-  async incrBy(key, value) {
+  async incrBy(key, value): Promise<number> {
     return this.redis.incrby(key, value);
   }
 }
