@@ -1,10 +1,12 @@
 import {
-  Body, Controller, Get, HttpException, HttpStatus, Param, Post, Res, UseGuards,
+  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, Res, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bull';
+import { Request, Response } from 'express';
 import { Queue } from 'bull';
 
+import { ConfigService } from '@nestjs/config';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
 
@@ -20,16 +22,32 @@ import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FileResponsesTypes } from '../../common/responses';
 import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
 import { RedisCacheService } from '../redisCache/redisCache.service';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('file')
 export class FileController {
+  private backendHost = this.configService.get('BACKEND_HOST');
+
   constructor(
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
     private readonly fileService: FileService,
     private readonly s3Service: S3Service,
     private readonly redisService: RedisCacheService,
     @InjectQueue('av-scan')
     private readonly avScanQueue: Queue,
   ) {}
+
+  @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get()
+  async getAll(
+    @CurrentUser() user: User,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+  ) {
+    return this.fileService.findManyByUserId(user.id, skip, take);
+  }
 
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware, CheckLimitMiddleware)
@@ -51,7 +69,7 @@ export class FileController {
   @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/chunk')
   async chunk(
-  @Param('id') id: number,
+    @Param('id') id: number,
     @CurrentUser() user: User,
     @Body() data: ChunkDto,
   ) {
@@ -114,11 +132,15 @@ export class FileController {
     return this.fileService.findByIdAndUserId(id, user.id);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
   @Get('/:id/download')
-  async download(@Res() res, @Param('id') id: number, @CurrentUser() user: User) {
-    const file = await this.fileService.findByIdAndUserId(id, user.id);
+  async download(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: number,
+  ) {
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
+
+    const file = await this.fileService.findById(id);
 
     if (!file) {
       throw new HttpException(
@@ -148,9 +170,17 @@ export class FileController {
     });
   }
 
+  @UseGuards(AuthMiddleware)
+  @Delete('/:id')
+  async delete(
+    @Param('id') id: number,
+  ) {
+    return this.fileService.deleteById(id);
+  }
+
   @Post('/:id/report')
   async report(
-  @Param('id') id: number,
+    @Param('id') id: number,
   ) {
     await this.avScanQueue.add('check', {
       id,
@@ -158,6 +188,29 @@ export class FileController {
 
     return {
       mCode: FileResponsesTypes.SCHEDULED_FOR_CHECK,
+    };
+  }
+
+  @UseGuards(AuthMiddleware)
+  @Post('/share/:id')
+  async share(
+    @CurrentUser() user: User,
+    @Param('id') id: number,
+  ) {
+    const file = await this.fileService.findByIdAndUserId(id, user.id);
+
+    if (!file) {
+      throw new HttpException(
+        FileError.FileWithThisIdNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return {
+      link: this.authService.signUrl(
+        `${this.backendHost}/file/${id}/download`,
+        180000,
+      ),
     };
   }
 }

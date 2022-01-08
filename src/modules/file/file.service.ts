@@ -24,12 +24,13 @@ export class FileService {
     });
   }
 
-  findManyByUserId(userId) {
-    return this.repository.find({
-      select: ['id'],
+  findManyByUserId(userId, skip, take) {
+    return this.repository.findAndCount({
       where: {
         user: userId,
       },
+      skip,
+      take,
     });
   }
 
