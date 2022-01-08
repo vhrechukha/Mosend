@@ -1,9 +1,9 @@
 import {
-  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Req, Res, UseGuards,
+  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, Res, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bull';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { Queue } from 'bull';
 
 import { ConfigService } from '@nestjs/config';
@@ -26,7 +26,7 @@ import { AuthService } from '../auth/auth.service';
 
 @Controller('file')
 export class FileController {
-  private frontendHost = this.configService.get('FRONTEND_HOST');
+  private backendHost = this.configService.get('BACKEND_HOST');
 
   constructor(
     private readonly configService: ConfigService,
@@ -41,8 +41,12 @@ export class FileController {
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware)
   @Get()
-  async getAll(@CurrentUser() user: User) {
-    return this.fileService.findManyByUserId(user.id);
+  async getAll(
+    @CurrentUser() user: User,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+  ) {
+    return this.fileService.findManyByUserId(user.id, skip, take);
   }
 
   @ApiBearerAuth()
@@ -128,11 +132,15 @@ export class FileController {
     return this.fileService.findByIdAndUserId(id, user.id);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthMiddleware)
   @Get('/:id/download')
-  async download(@Res() res, @Param('id') id: number, @CurrentUser() user: User) {
-    const file = await this.fileService.findByIdAndUserId(id, user.id);
+  async download(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Param('id') id: number,
+  ) {
+    this.authService.verifySignedUrl(`${this.backendHost}${req.originalUrl}`);
+
+    const file = await this.fileService.findById(id);
 
     if (!file) {
       throw new HttpException(
@@ -162,6 +170,7 @@ export class FileController {
     });
   }
 
+  @UseGuards(AuthMiddleware)
   @Delete('/:id')
   async delete(
     @Param('id') id: number,
@@ -171,7 +180,7 @@ export class FileController {
 
   @Post('/:id/report')
   async report(
-  @Param('id') id: number,
+    @Param('id') id: number,
   ) {
     await this.avScanQueue.add('check', {
       id,
@@ -182,7 +191,8 @@ export class FileController {
     };
   }
 
-  @Post('/share')
+  @UseGuards(AuthMiddleware)
+  @Post('/share/:id')
   async share(
     @CurrentUser() user: User,
     @Param('id') id: number,
@@ -196,21 +206,11 @@ export class FileController {
       );
     }
 
-    return this.authService.signUrl(
-      `${this.frontendHost}/files/share?id=${id}`,
-      180000,
-    );
-  }
-
-  @Get('/share')
-  async verifyShare(
-    @CurrentUser() user: User,
-    @Req() req: Request,
-  ) {
-    this.authService.verifySignedUrl(`${this.frontendHost}${req.originalUrl}`);
-
     return {
-      mCode: FileResponsesTypes.SHARE_LINK_VERIFIED,
+      link: this.authService.signUrl(
+        `${this.backendHost}/file/${id}/download`,
+        180000,
+      ),
     };
   }
 }

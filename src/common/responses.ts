@@ -16,6 +16,7 @@ enum EmailResponsesTypes {
 
 enum FileResponsesTypes {
   SCHEDULED_FOR_CHECK = 'SCHEDULED_FOR_CHECK',
+  SHARE_LINK_VERIFIED = 'SHARE_LINK_VERIFIED',
 }
 
 export {
