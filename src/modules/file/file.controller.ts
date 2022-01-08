@@ -3,8 +3,10 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bull';
+import { Request } from 'express';
 import { Queue } from 'bull';
 
+import { ConfigService } from '@nestjs/config';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
 
@@ -20,10 +22,15 @@ import { AuthMiddleware } from '../../common/guards/auth.middleware';
 import { FileResponsesTypes } from '../../common/responses';
 import { CheckLimitMiddleware } from '../../common/guards/checkLimit.middleware';
 import { RedisCacheService } from '../redisCache/redisCache.service';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('file')
 export class FileController {
+  private frontendHost = this.configService.get('FRONTEND_HOST');
+
   constructor(
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
     private readonly fileService: FileService,
     private readonly s3Service: S3Service,
     private readonly redisService: RedisCacheService,
@@ -172,6 +179,38 @@ export class FileController {
 
     return {
       mCode: FileResponsesTypes.SCHEDULED_FOR_CHECK,
+    };
+  }
+
+  @Post('/share')
+  async share(
+    @CurrentUser() user: User,
+    @Param('id') id: number,
+  ) {
+    const file = await this.fileService.findByIdAndUserId(id, user.id);
+
+    if (!file) {
+      throw new HttpException(
+        FileError.FileWithThisIdNotFound,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.authService.signUrl(
+      `${this.frontendHost}/files/share?id=${id}`,
+      180000,
+    );
+  }
+
+  @Get('/share')
+  async verifyShare(
+    @CurrentUser() user: User,
+    @Req() req: Request,
+  ) {
+    this.authService.verifySignedUrl(`${this.frontendHost}${req.originalUrl}`);
+
+    return {
+      mCode: FileResponsesTypes.SHARE_LINK_VERIFIED,
     };
   }
 }
