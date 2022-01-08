@@ -26,7 +26,6 @@ export class FileService {
 
   findManyByUserId(userId) {
     return this.repository.find({
-      select: ['id'],
       where: {
         user: userId,
       },

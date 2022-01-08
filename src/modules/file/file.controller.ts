@@ -32,6 +32,13 @@ export class FileController {
   ) {}
 
   @ApiBearerAuth()
+  @UseGuards(AuthMiddleware)
+  @Get()
+  async getAll(@CurrentUser() user: User) {
+    return this.fileService.findManyByUserId(user.id);
+  }
+
+  @ApiBearerAuth()
   @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post()
   async initialize(@CurrentUser() user: User, @Body() data: InitializeDto) {
