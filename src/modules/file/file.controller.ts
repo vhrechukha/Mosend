@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, HttpException, HttpStatus, Param, Post, Res, UseGuards,
+  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Req, Res, UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bull';
@@ -58,7 +58,7 @@ export class FileController {
   @UseGuards(AuthMiddleware, CheckLimitMiddleware)
   @Post('/:id/chunk')
   async chunk(
-  @Param('id') id: number,
+    @Param('id') id: number,
     @CurrentUser() user: User,
     @Body() data: ChunkDto,
   ) {
@@ -153,6 +153,13 @@ export class FileController {
         });
       }
     });
+  }
+
+  @Delete('/:id')
+  async delete(
+    @Param('id') id: number,
+  ) {
+    return this.fileService.deleteById(id);
   }
 
   @Post('/:id/report')
