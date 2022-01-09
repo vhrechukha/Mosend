@@ -157,6 +157,8 @@ export class FileController {
       filename: file.filename,
     });
 
+    res.attachment(file.filename);
+
     s3File.pipe(res);
 
     s3File.on('end', async () => {
