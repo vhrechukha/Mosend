@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.use(helmet());
-  app.use(bodyParser.json({ limit: '5000b' }));
+  app.use(bodyParser.json({ limit: '5000mb' }));
   app.use(bodyParser.urlencoded({ limit: '5000mb', extended: true }));
 
   app.useGlobalFilters(new AllExceptionsFilter());
