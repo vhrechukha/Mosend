@@ -1,5 +1,7 @@
 import {
-  Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Query, Req, Res, UseGuards,
+  Body, Controller, Delete, Get, HttpException,
+  HttpStatus, Param, Post, Query, Req, Res,
+  UploadedFile, UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bull';
@@ -7,12 +9,12 @@ import { Request, Response } from 'express';
 import { Queue } from 'bull';
 
 import { ConfigService } from '@nestjs/config';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { S3Service } from './s3.service';
 
 import { InitializeDto } from './dto/Initialize.dto';
 import { FinalizeDto } from './dto/Finalize.dto';
-import { ChunkDto } from './dto/Chunk.dto';
 
 import { FileError } from '../../common/errors';
 import { User } from '../user/entities/user.entity';
@@ -67,11 +69,13 @@ export class FileController {
 
   @ApiBearerAuth()
   @UseGuards(AuthMiddleware, CheckLimitMiddleware)
+  @UseInterceptors(FileInterceptor('body'))
   @Post('/:id/chunk')
   async chunk(
     @Param('id') id: number,
     @CurrentUser() user: User,
-    @Body() data: ChunkDto,
+    @UploadedFile() body,
+    @Body('partNumber') partNumber: number,
   ) {
     const file = await this.fileService.findByIdAndUserId(id, user.id);
 
@@ -86,9 +90,8 @@ export class FileController {
         extension: file.extension,
       },
       UploadId: file.s3_path,
-      PartNumber: data.partNumber,
-      ContentLength: data.contentLength,
-      Body: data.body,
+      PartNumber: partNumber,
+      Body: body.buffer,
     });
 
     await this.fileService.save({
