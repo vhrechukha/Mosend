@@ -22,7 +22,7 @@ export class CheckLimitMiddleware implements CanActivate {
     const user = await this.userService.findOneById(userId);
     const { size, count } = await this.fileService.getInfoAboutFullnesOfLimits(userId);
 
-    if (user.f_count_max < count || user.f_size_max < size) {
+    if (user.f_count_max < count || Number(user.f_size_max) < Number(size)) {
       throw new HttpException(
         UserError.LimitExceeded,
         HttpStatus.FORBIDDEN,

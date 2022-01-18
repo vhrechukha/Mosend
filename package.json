@@ -25,6 +25,7 @@
     "migrations:down": "npx typeorm migration:revert"
   },
   "dependencies": {
+    "@nestjs/platform-express": "^8.2.4",
     "@nestjs/bull": "^0.4.2",
     "@nestjs/cli": "^8.0.0",
     "@nestjs/common": "^8.2.3",
@@ -70,7 +71,6 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@nestjs/platform-express": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",
     "@nestjs/testing": "^8.0.0",
     "@types/bcrypt": "^5.0.0",
